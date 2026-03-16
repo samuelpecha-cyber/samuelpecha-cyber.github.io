@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html lang="sk">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Čarodejnícka dielňa</title>
-
+<title>🧙 Čarodejnícka dielňa - Stanovisko 5</title>
 <style>
-
 body{
 font-family:Inter,system-ui;
 background:#064e3b;
@@ -16,73 +12,121 @@ color:white;
 text-align:center;
 padding:40px;
 }
-
 h1{
 color:#fbbf24;
+text-shadow:2px 2px 4px rgba(0,0,0,0.5);
 }
-
 button{
-
 font-size:22px;
 padding:15px 30px;
-margin-top:20px;
+margin:10px;
 background:#f59e0b;
 border:none;
 border-radius:15px;
 cursor:pointer;
-
+transition:all 0.3s;
 }
-
 button:hover{
 background:#fbbf24;
+transform:scale(1.05);
 }
-
+button:disabled{
+background:#666;
+cursor:not-allowed;
+transform:none;
+}
+#status {
+margin-top:20px;
+font-size:18px;
+padding:15px;
+border-radius:10px;
+}
+.success {background:#10b981;color:white;}
+.error {background:#ef4444;color:white;}
+.loading {background:#3b82f6;color:white;}
 </style>
-
 </head>
 
 <body>
-
 <h1>🧙 Čarodejnícka dielňa</h1>
-
-<p>
-Spočítaj predmety a vyber správne číslo.
-</p>
+<p>Spočítaj predmety a vyber správne číslo.</p>
 
 <button onclick="startGame()">
-Spustiť aktivitu
+🎮 Spustiť aktivitu
 </button>
-
-<br>
-
-<button onclick="finishStation(5)">
-Dokončil som úlohu
+<br><br>
+<button id="finishBtn" onclick="finishStation(5)">
+✅ Dokončil som úlohu
 </button>
+<div id="status"></div>
 
 <script>
+const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
 
 function startGame(){
-
-window.open(
-"https://wordwall.net/resource/35923730/math/ko%C4%BEko",
-"_blank"
-)
-
+    window.open("https://wordwall.net/resource/35923730/math/koľko", "_blank");
+    document.getElementById("status").innerHTML = "📚 Aktivita otvorená v novej karte. Po dokončení klikni ✅!";
+    document.getElementById("status").className = "loading";
 }
 
 function finishStation(id){
+    // Počítaj navštívené stanovištia
+    let visited = new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
+    visited.add(String(id));
+    localStorage.setItem("visitedStations", JSON.stringify([...visited]));
+    
+    // Získaj alebo vytvor hráča
+    let playerName = localStorage.getItem("playerName") || prompt("Zadaj svoje meno:", "Hráč");
+    let playerId = localStorage.getItem("playerId") || "hrac_" + Date.now();
+    
+    if(playerName) {
+        localStorage.setItem("playerName", playerName);
+        localStorage.setItem("playerId", playerId);
+    }
 
-let visited=new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"))
+    const payload = {
+        name: playerName || "Neznámy hráč",
+        playerId: playerId,
+        station: id,
+        score: visited.size
+    };
+    
+    const url = API + "?" + new URLSearchParams(payload).toString();
+    
+    // UI feedback
+    const statusEl = document.getElementById("status");
+    const finishBtn = document.getElementById("finishBtn");
+    
+    statusEl.innerHTML = "📤 Odosielam dáta do Google Sheets...";
+    statusEl.className = "loading";
+    finishBtn.disabled = true;
+    finishBtn.textContent = "Odosiela sa...";
 
-visited.add(String(id))
-
-localStorage.setItem("visitedStations",JSON.stringify([...visited]))
-
-window.location.href="index.html"
-
+    // Odoslanie
+    fetch(url, { method: 'GET' })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.text();
+        })
+        .then(data => {
+            console.log("✅ ÚSPECH:", data, payload);
+            statusEl.innerHTML = `✅ ÚLOHA DOKONČENÁ!<br><strong>${playerName}</strong> - Stanovisko ${id}<br>Navštívené: ${visited.size}`;
+            statusEl.className = "success";
+            
+            setTimeout(() => {
+                if(confirm("Vrátiť sa na mapu?")) {
+                    window.location.href = "index.html";
+                }
+            }, 2000);
+        })
+        .catch(error => {
+            console.error("❌ CHYBA:", error);
+            statusEl.innerHTML = `❌ Chyba: ${error.message}<br>Konzola (F12) má detaily. Skús znova.`;
+            statusEl.className = "error";
+            finishBtn.disabled = false;
+            finishBtn.textContent = "✅ Dokončil som úlohu";
+        });
 }
-
 </script>
-
 </body>
 </html>
