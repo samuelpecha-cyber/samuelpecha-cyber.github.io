@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Čarodejnícka dielňa</title>
+
+<style>
+
+body{
+font-family:Inter,system-ui;
+background:#064e3b;
+color:white;
+text-align:center;
+padding:40px;
+}
+
+h1{
+color:#fbbf24;
+}
+
+button{
+
+font-size:22px;
+padding:15px 30px;
+margin-top:20px;
+background:#f59e0b;
+border:none;
+border-radius:15px;
+cursor:pointer;
+
+}
+
+button:hover{
+background:#fbbf24;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🧙 Čarodejnícka dielňa</h1>
+
+<p>
+Spočítaj predmety a vyber správne číslo.
+</p>
+
+<button onclick="startGame()">
+Spustiť aktivitu
+</button>
+
+<br>
+
+<button onclick="finishStation(5)">
+Dokončil som úlohu
+</button>
+
+<script>
+
+function startGame(){
+
+window.open(
+"https://wordwall.net/resource/35923730/math/ko%C4%BEko",
+"_blank"
+)
+
+}
+
+function finishStation(id){
+
+let visited=new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"))
+
+visited.add(String(id))
+
+localStorage.setItem("visitedStations",JSON.stringify([...visited]))
+
+window.location.href="index.html"
+
+}
+
+</script>
+
+</body>
+</html>
