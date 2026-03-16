@@ -12,184 +12,185 @@
 <style>
 
 *{
-box-sizing:border-box;
-font-family:'Inter',system-ui;
+  box-sizing:border-box;
+  font-family:'Inter',system-ui;
 }
 
 body{
-margin:0;
-min-height:100vh;
-display:flex;
-flex-direction:column;
-align-items:center;
-color:white;
-overflow-x:hidden;
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  color:white;
+  overflow-x:hidden;
 
-background-image:url("https://media.discordapp.net/attachments/783422667826921534/1483075471158804490/iu_.png?ex=69b9452a&is=69b7f3aa&hm=f10e5b2a32e4f00559955472e07091c7ebd9ceff5d8973945371a931376db5e9&=&format=webp&quality=lossless&width=1503&height=859");
-background-size:cover;
-background-position:center;
-background-attachment:fixed;
+  background-image:url("https://media.discordapp.net/attachments/783422667826921534/1483075471158804490/iu_.png?ex=69b9452a&is=69b7f3aa&hm=f10e5b2a32e4f00559955472e07091c7ebd9ceff5d8973945371a931376db5e9&=&format=webp&quality=lossless&width=1503&height=859");
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
 }
 
 body::before{
-content:"";
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.35);
-z-index:-1;
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  z-index:-1;
 }
 
 header{
-text-align:center;
-padding:30px 20px 10px;
-width:100%;
-max-width:900px;
+  text-align:center;
+  padding:30px 20px 10px;
+  width:100%;
+  max-width:900px;
 }
 
 h1{
-margin:0;
-color:#fbbf24;
-font-size:clamp(28px,5vw,42px);
+  margin:0;
+  color:#fbbf24;
+  font-size:clamp(28px,5vw,42px);
 }
 
 .subtitle{
-color:#d1fae5;
-margin-top:8px;
+  color:#d1fae5;
+  margin-top:8px;
 }
 
 .player-box{
-margin-top:15px;
+  margin-top:15px;
 }
 
 .player-box input{
-padding:8px;
-font-size:16px;
-border-radius:10px;
-border:none;
+  padding:8px;
+  font-size:16px;
+  border-radius:10px;
+  border:none;
 }
 
 .player-box button{
-padding:8px 16px;
-border-radius:10px;
-border:none;
-background:#f59e0b;
-cursor:pointer;
+  padding:8px 16px;
+  border-radius:10px;
+  border:none;
+  background:#f59e0b;
+  cursor:pointer;
+  margin-left:5px;
 }
 
 .progress-wrapper{
-margin-top:20px;
-background:#022c22;
-border-radius:999px;
-overflow:hidden;
-height:16px;
+  margin-top:20px;
+  background:#022c22;
+  border-radius:999px;
+  overflow:hidden;
+  height:16px;
 }
 
 .progress-bar{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#fbbf24,#f59e0b);
-transition:.4s;
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#fbbf24,#f59e0b);
+  transition:.4s;
 }
 
 .progress-text{
-margin-top:6px;
-font-size:14px;
-color:#fde68a;
+  margin-top:6px;
+  font-size:14px;
+  color:#fde68a;
 }
 
 .board{
-width:95%;
-max-width:900px;
-margin-top:30px;
-padding:60px 40px 70px;
-border-radius:30px;
-background:linear-gradient(180deg,#9a6b3f,#7a512c);
-box-shadow:
-0 30px 80px rgba(0,0,0,.5),
-inset 0 8px 20px rgba(255,255,255,.15);
-border:8px solid #5b3b20;
+  width:95%;
+  max-width:900px;
+  margin-top:30px;
+  padding:60px 40px 70px;
+  border-radius:30px;
+  background:linear-gradient(180deg,#9a6b3f,#7a512c);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.5),
+    inset 0 8px 20px rgba(255,255,255,.15);
+  border:8px solid #5b3b20;
 }
 
 .map{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:60px 20px;
-justify-items:center;
-align-items:center;
-width:100%;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:60px 20px;
+  justify-items:center;
+  align-items:center;
+  width:100%;
 }
 
 .station{
-width:clamp(95px,10vw,120px);
-height:clamp(95px,10vw,120px);
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:clamp(40px,5vw,52px);
-cursor:pointer;
-transition:.25s;
-border:4px solid rgba(255,255,255,.5);
-box-shadow:
-0 0 15px rgba(0,0,0,.5),
-0 0 12px rgba(255,255,255,.2);
+  width:clamp(95px,10vw,120px);
+  height:clamp(95px,10vw,120px);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:clamp(40px,5vw,52px);
+  cursor:pointer;
+  transition:.25s;
+  border:4px solid rgba(255,255,255,.5);
+  box-shadow:
+    0 0 15px rgba(0,0,0,.5),
+    0 0 12px rgba(255,255,255,.2);
 }
 
 .station:hover{
-transform:scale(1.15);
-box-shadow:
-0 0 25px #fde047,
-0 0 40px rgba(255,255,255,.4);
+  transform:scale(1.15);
+  box-shadow:
+    0 0 25px #fde047,
+    0 0 40px rgba(255,255,255,.4);
 }
 
 .station.visited{
-filter:brightness(1.3);
-box-shadow:
-0 0 25px #fde047,
-0 0 40px #fde047;
+  filter:brightness(1.3);
+  box-shadow:
+    0 0 25px #fde047,
+    0 0 40px #fde047;
 }
 
 .label{
-margin-top:10px;
-background:rgba(0,0,0,.45);
-padding:5px 12px;
-border-radius:20px;
-font-size:14px;
+  margin-top:10px;
+  background:rgba(0,0,0,.45);
+  padding:5px 12px;
+  border-radius:20px;
+  font-size:14px;
 }
 
 .level{
-display:flex;
-flex-direction:column;
-align-items:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
 .firefly{
-position:fixed;
-width:6px;
-height:6px;
-background:#fef08a;
-border-radius:50%;
-box-shadow:0 0 8px #fef08a,0 0 20px #fde047;
-animation:float 10s linear infinite;
-opacity:.9;
+  position:fixed;
+  width:6px;
+  height:6px;
+  background:#fef08a;
+  border-radius:50%;
+  box-shadow:0 0 8px #fef08a,0 0 20px #fde047;
+  animation:float 10s linear infinite;
+  opacity:.9;
 }
 
 @keyframes float{
-0%{transform:translateY(100vh);opacity:0}
-10%{opacity:1}
-100%{transform:translateY(-10vh) translateX(60px);opacity:0}
+  0%{transform:translateY(100vh);opacity:0}
+  10%{opacity:1}
+  100%{transform:translateY(-10vh) translateX(60px);opacity:0}
 }
 
 .confetti{
-position:fixed;
-width:8px;
-height:8px;
-top:-10px;
-animation:fall 3s linear forwards;
+  position:fixed;
+  width:8px;
+  height:8px;
+  top:-10px;
+  animation:fall 3s linear forwards;
 }
 
 @keyframes fall{
-to{transform:translateY(110vh) rotate(720deg)}
+  to{transform:translateY(110vh) rotate(720deg)}
 }
 
 </style>
@@ -203,13 +204,9 @@ to{transform:translateY(110vh) rotate(720deg)}
 <div class="subtitle">Objav všetky stanovištia!</div>
 
 <div class="player-box">
-
 <input id="playerName" placeholder="Tvoje meno">
-
-<button onclick="startGame()">
-Začať
-</button>
-
+<button onclick="startGame()">Začať</button>
+<button onclick="resetGame()">Reset hry</button>
 </div>
 
 <div class="progress-wrapper">
@@ -271,91 +268,95 @@ Začať
 
 <script>
 
-const API="https://script.google.com/macros/s/AKfycbx2FpsQ5Yoa__VPHNv-qZpNQH3MHdS377ZaKY4l5Ph6x4ohNrj8nLmPh8K4Gsya32w9/exec"
+const API="https://script.google.com/macros/s/AKfycbyRXCLcxV76FGtBiQwNNv9v21yQnbVSGwzpVk136Lk7kE4VkVfoDW4KsJ8_iaOW4dSs/exec";
 
-let playerId=localStorage.getItem("playerId")
-let playerName=localStorage.getItem("playerName")
+let playerId=localStorage.getItem("playerId");
+let playerName=localStorage.getItem("playerName");
 
 function startGame(){
-
-const name=document.getElementById("playerName").value
-
-if(!name){
-alert("Zadaj meno")
-return
+    const name=document.getElementById("playerName").value;
+    if(!name){
+        alert("Zadaj meno");
+        return;
+    }
+    playerId=crypto.randomUUID();
+    localStorage.setItem("playerId",playerId);
+    localStorage.setItem("playerName",name);
+    location.reload();
 }
 
-playerId=crypto.randomUUID()
-
-localStorage.setItem("playerId",playerId)
-localStorage.setItem("playerName",name)
-
-location.reload()
-
+// reset hry
+function resetGame(){
+    if(confirm("Naozaj chceš resetovať hru?")){
+        localStorage.removeItem("visitedStations");
+        localStorage.removeItem("playerId");
+        localStorage.removeItem("playerName");
+        location.reload();
+    }
 }
 
-const stations=document.querySelectorAll(".station")
-const bar=document.getElementById("bar")
-const text=document.getElementById("progressText")
+const stations=document.querySelectorAll(".station");
+const bar=document.getElementById("bar");
+const text=document.getElementById("progressText");
 
-let visited=new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"))
+let visited=new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
 
 stations.forEach(s=>{
+    const id=s.dataset.id;
+    if(visited.has(id)){
+        s.classList.add("visited");
+    }
+    s.onclick=()=>{
+        if(!playerId){
+            alert("Najprv zadaj meno");
+            return;
+        }
+        window.location.href="stanoviste"+id+".html";
+    }
+});
 
-const id=s.dataset.id
-
-if(visited.has(id)){
-s.classList.add("visited")
-}
-
-s.onclick=()=>{
-
-if(!playerId){
-alert("Najprv zadaj meno")
-return
-}
-
-window.location.href="stanoviste"+id+".html"
-
-}
-
-})
-
-bar.style.width=(visited.size/8)*100+"%"
-text.innerText=visited.size+" / 8 objavené"
+bar.style.width=(visited.size/8)*100+"%";
+text.innerText=visited.size+" / 8 objavené";
 
 function sendScore(station){
-
-fetch(API,{
-method:"POST",
-body:JSON.stringify({
-
-name:localStorage.getItem("playerName"),
-playerId:localStorage.getItem("playerId"),
-station:station,
-score:visited.size
-
-})
-})
-
+    let visitedSet=new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
+    fetch(API,{
+        method:"POST",
+        mode:"no-cors",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            name:localStorage.getItem("playerName"),
+            playerId:localStorage.getItem("playerId"),
+            station:station,
+            score:visitedSet.size
+        })
+    });
 }
 
-window.sendScore=sendScore
+window.sendScore=sendScore;
 
 function spawnFirefly(){
-
-const f=document.createElement("div")
-f.className="firefly"
-f.style.left=Math.random()*100+"vw"
-f.style.animationDuration=(6+Math.random()*8)+"s"
-
-document.body.appendChild(f)
-
-setTimeout(()=>f.remove(),14000)
-
+    const f=document.createElement("div");
+    f.className="firefly";
+    f.style.left=Math.random()*100+"vw";
+    f.style.animationDuration=(6+Math.random()*8)+"s";
+    document.body.appendChild(f);
+    setTimeout(()=>f.remove(),14000);
 }
 
-setInterval(spawnFirefly,350)
+setInterval(spawnFirefly,350);
+
+function launchConfetti(){
+    for(let i=0;i<160;i++){
+        const c=document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"vw";
+        c.style.background=`hsl(${Math.random()*360},80%,60%)`;
+        c.style.animationDelay=Math.random()*1+"s";
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),4000);
+    }
+}
 
 </script>
 
