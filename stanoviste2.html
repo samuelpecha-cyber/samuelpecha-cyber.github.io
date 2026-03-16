@@ -1,1 +1,111 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Hrad písmen</title>
+
+<style>
+
+body{
+font-family:Inter,system-ui;
+background:#1e3a8a;
+color:white;
+text-align:center;
+padding:40px;
+}
+
+h1{
+color:#fbbf24;
+}
+
+select{
+
+font-size:20px;
+padding:10px;
+margin-top:20px;
+border-radius:10px;
+border:none;
+
+}
+
+button{
+
+font-size:20px;
+padding:15px 30px;
+margin-top:20px;
+background:#f59e0b;
+border:none;
+border-radius:15px;
+cursor:pointer;
+
+}
+
+button:hover{
+background:#fbbf24;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🏰 Hrad písmen</h1>
+
+<p>
+Vyber si pexeso a nájdi správne dvojice!
+</p>
+
+<select id="gameSelect">
+
+<option value="https://puzzel.org/sk/memory/play?p=-OnYa0O4E3Wyx-2U2_hi">
+⚽ Futbalisti
+</option>
+
+<option value="https://puzzel.org/sk/memory/play?p=-Onmc_amm9vCRqQerBEZ">
+🌸 Kvetinky a zvieratká
+</option>
+
+</select>
+
+<br>
+
+<button onclick="startGame()">
+Spustiť pexeso
+</button>
+
+<br>
+
+<button onclick="finishStation(2)">
+Dokončil som úlohu
+</button>
+
+<script>
+
+function startGame(){
+
+const link=document.getElementById("gameSelect").value
+
+window.open(link,"_blank")
+
+}
+
+function finishStation(id){
+
+let visited=new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"))
+
+visited.add(String(id))
+
+localStorage.setItem("visitedStations",JSON.stringify([...visited]))
+
+window.location.href="index.html"
+
+}
+
+</script>
+
+</body>
+</html>
