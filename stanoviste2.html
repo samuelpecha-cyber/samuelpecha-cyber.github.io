@@ -1,118 +1,99 @@
 <!DOCTYPE html>
 <html lang="sk">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hrad písmen</title>
+<title>🏰 Hrad písmen</title>
 
 <style>
-
 body{
-font-family:Arial;
-background:#1e3a8a;
-color:white;
-text-align:center;
-padding:40px;
+  font-family:Arial;
+  background:#1e3a8a;
+  color:white;
+  text-align:center;
+  padding:40px;
 }
 
 h1{
-color:#fbbf24;
+  color:#fbbf24;
 }
 
 select{
-font-size:20px;
-padding:10px;
-margin-top:20px;
-border-radius:10px;
+  font-size:20px;
+  padding:10px;
+  margin-top:20px;
+  border-radius:10px;
 }
 
 button{
-font-size:20px;
-padding:15px 30px;
-margin-top:20px;
-background:#f59e0b;
-border:none;
-border-radius:15px;
-cursor:pointer;
+  font-size:20px;
+  padding:15px 30px;
+  margin-top:20px;
+  background:#f59e0b;
+  border:none;
+  border-radius:15px;
+  cursor:pointer;
 }
 
 button:hover{
-background:#fbbf24;
+  background:#fbbf24;
 }
-
 </style>
-
 </head>
 
 <body>
 
 <h1>🏰 Hrad písmen</h1>
 
-<p>Vyber si pexeso.</p>
+<p>Vyber si pexeso:</p>
 
 <select id="gameSelect">
-
-<option value="https://puzzel.org/sk/memory/play?p=-OnYa0O4E3Wyx-2U2_hi">
-⚽ Futbalisti
-</option>
-
-<option value="https://puzzel.org/sk/memory/play?p=-Onmc_amm9vCRqQerBEZ">
-🌸 Kvetinky a zvieratká
-</option>
-
+  <option value="https://puzzel.org/sk/memory/play?p=-OnYa0O4E3Wyx-2U2_hi">
+    ⚽ Futbalisti
+  </option>
+  <option value="https://puzzel.org/sk/memory/play?p=-Onmc_amm9vCRqQerBEZ">
+    🌸 Kvetinky a zvieratká
+  </option>
 </select>
 
 <br>
 
 <button onclick="startGame()">Spustiť pexeso</button>
-
 <br>
-
 <button onclick="finishStation()">Dokončil som úlohu</button>
 
 <script>
-
 const API="https://script.google.com/macros/s/AKfycbyRXCLcxV76FGtBiQwNNv9v21yQnbVSGwzpVk136Lk7kE4VkVfoDW4KsJ8_iaOW4dSs/exec";
 
 function startGame(){
-    const link = document.getElementById("gameSelect").value;
-    window.open(link, "_blank");
+  const link=document.getElementById("gameSelect").value;
+  window.open(link,"_blank");
 }
 
 function sendScore(station){
-    const visited = new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
+    const payload={
+        name:localStorage.getItem("playerName"),
+        playerId:localStorage.getItem("playerId"),
+        station:station,
+        score:(JSON.parse(localStorage.getItem("visitedStations") || "[]")).length
+    };
+    const params=new URLSearchParams(payload).toString();
+    const url=API+"?"+params;
 
-    // POST request do Google Sheets
-    fetch(API,{
-        method:"POST",
-        mode:"no-cors", // no-cors kvôli CORS pri Google Apps Script
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            name: localStorage.getItem("playerName"),
-            playerId: localStorage.getItem("playerId"),
-            station: station,
-            score: visited.size
-        })
-    });
+    const img=new Image(); // len aby request prebehol, CORS-friendly
+    img.src=url;
 }
 
 function finishStation(){
-    const visited = new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
-
-    visited.add("2"); // ID stanovišťa Hrad písmen
-
+    const stationId=2; // Hrad písmen
+    let visited=new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
+    visited.add(stationId.toString());
     localStorage.setItem("visitedStations", JSON.stringify([...visited]));
 
-    // odošli dáta do Google Sheets
-    sendScore(2);
+    sendScore(stationId);
 
-    // vráť hráča na hlavnú mapu
     window.location.href="index.html";
 }
-
 </script>
 
 </body>
