@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Čarovný Les</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  box-sizing:border-box;
+  font-family:'Inter',system-ui;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  color:white;
+  overflow-x:hidden;
+
+  /* TVOJ OBRAZOK Z DISCORDU */
+  background-image: url("https://media.discordapp.net/attachments/783422667826921534/1483075471158804490/iu_.png?ex=69b9452a&is=69b7f3aa&hm=f10e5b2a32e4f00559955472e07091c7ebd9ceff5d8973945371a931376db5e9&=&format=webp&quality=lossless&width=1503&height=859");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* DARK OVERLAY */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  z-index:-1;
+}
+
+/* HEADER */
+header{
+  text-align:center;
+  padding:30px 20px 10px;
+  width:100%;
+  max-width:900px;
+}
+
+h1{
+  margin:0;
+  color:#fbbf24;
+  font-size:clamp(28px,5vw,42px);
+}
+
+.subtitle{
+  color:#d1fae5;
+  margin-top:8px;
+}
+
+/* PROGRESS */
+.progress-wrapper{
+  margin-top:20px;
+  background:#022c22;
+  border-radius:999px;
+  overflow:hidden;
+  height:16px;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#fbbf24,#f59e0b);
+  transition:.4s;
+}
+
+.progress-text{
+  margin-top:6px;
+  font-size:14px;
+  color:#fde68a;
+}
+
+/* BOARD */
+.board{
+  width:95%;
+  max-width:900px;
+  margin-top:30px;
+  padding:60px 40px 70px;
+  border-radius:30px;
+  background:linear-gradient(180deg,#9a6b3f,#7a512c);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.5),
+    inset 0 8px 20px rgba(255,255,255,.15);
+  border:8px solid #5b3b20;
+}
+
+/* MAP GRID */
+.map{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:60px 20px;
+  justify-items:center;
+  align-items:center;
+  width:100%;
+}
+
+/* STATION */
+.station{
+  width:clamp(95px,10vw,120px);
+  height:clamp(95px,10vw,120px);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:clamp(40px,5vw,52px);
+  cursor:pointer;
+  transition:.25s;
+  border:4px solid rgba(255,255,255,.5);
+  box-shadow:
+    0 0 15px rgba(0,0,0,.5),
+    0 0 12px rgba(255,255,255,.2);
+}
+
+.station:hover{
+  transform:scale(1.15);
+  box-shadow:
+    0 0 25px #fde047,
+    0 0 40px rgba(255,255,255,.4);
+}
+
+.station.visited{
+  filter:brightness(1.3);
+  box-shadow:
+    0 0 25px #fde047,
+    0 0 40px #fde047;
+}
+
+.label{
+  margin-top:10px;
+  background:rgba(0,0,0,.45);
+  padding:5px 12px;
+  border-radius:20px;
+  font-size:14px;
+}
+
+.level{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.modal-box{
+  background:#064e3b;
+  padding:30px;
+  border-radius:22px;
+  border:4px solid #fbbf24;
+  text-align:center;
+  max-width:420px;
+  width:100%;
+  box-shadow:0 0 40px rgba(0,0,0,.6);
+  animation:popup .3s ease;
+}
+
+@keyframes popup{
+  0%{transform:scale(.7);opacity:0}
+  100%{transform:scale(1);opacity:1}
+}
+
+button{
+  margin-top:20px;
+  background:#f59e0b;
+  border:none;
+  padding:12px 22px;
+  border-radius:20px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#fbbf24;
+}
+
+/* GAME BUTTONS */
+.game-buttons{
+  display:none;
+  margin-top:20px;
+  gap:15px;
+  flex-direction:column;
+}
+
+.game-btn{
+  background:#065f46;
+  border:3px solid #fbbf24;
+  border-radius:18px;
+  padding:18px;
+  font-size:22px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.game-btn:hover{
+  transform:scale(1.05);
+  background:#047857;
+}
+
+/* FIREFLIES */
+.firefly{
+  position:fixed;
+  width:6px;
+  height:6px;
+  background:#fef08a;
+  border-radius:50%;
+  box-shadow:
+    0 0 8px #fef08a,
+    0 0 20px #fde047;
+  animation:float 10s linear infinite;
+  opacity:.9;
+}
+
+@keyframes float{
+  0%{transform:translateY(100vh) translateX(0); opacity:0;}
+  10%{opacity:1;}
+  100%{transform:translateY(-10vh) translateX(60px); opacity:0;}
+}
+
+/* CONFETTI */
+.confetti{
+  position:fixed;
+  width:8px;
+  height:8px;
+  top:-10px;
+  animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+  to{transform:translateY(110vh) rotate(720deg);}
+}
+
+</style>
+</head>
+<body>
+
+<header>
+<h1>🌲 Čarovný Les 🌲</h1>
+<div class="subtitle">Objav všetky stanovištia!</div>
+<div class="progress-wrapper">
+  <div id="bar" class="progress-bar"></div>
+</div>
+<div id="progressText" class="progress-text">0 / 8 objavené</div>
+</header>
+
+<div class="board">
+  <div class="map">
+    <div class="level">
+      <div class="station" data-id="1" style="background:#7c3aed">🦉</div>
+      <div class="label">Domček Sovy</div>
+    </div>
+    <div class="level">
+      <div class="station" data-id="2" style="background:#3b82f6">🏰</div>
+      <div class="label">Hrad písmen</div>
+    </div>
+    <div class="level">
+      <div class="station" data-id="3" style="background:#ec4899">🌸</div>
+      <div class="label">Rozprávková lúka</div>
+    </div>
+    <div class="level">
+      <div class="station" data-id="4" style="background:#06b6d4">🎵</div>
+      <div class="label">Jazierko melódie</div>
+    </div>
+    <div class="level">
+      <div class="station" data-id="5" style="background:#6366f1">🧙</div>
+      <div class="label">Čarodejnícka dielňa</div>
+    </div>
+    <div class="level">
+      <div class="station" data-id="6" style="background:#22c55e">🏃</div>
+      <div class="label">Lesná telocvičňa</div>
+    </div>
+    <div class="level">
+      <div class="station" data-id="7" style="background:#d97706">🐻</div>
+      <div class="label">Medvedí brloh</div>
+    </div>
+    <div class="level">
+      <div class="station" data-id="8" style="background:#f43f5e">🌈</div>
+      <div class="label">Dúhový vodopád</div>
+    </div>
+  </div>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <div id="modalIcon" style="font-size:50px"></div>
+    <h2 id="modalTitle"></h2>
+
+    <div id="gameButtons" class="game-buttons">
+      <div class="game-btn" onclick="openGame('https://puzzel.org/sk/memory/play?p=-OnYa0O4E3Wyx-2U2_hi')">⚽ Futbalisti</div>
+      <div class="game-btn" onclick="openGame('https://puzzel.org/sk/memory/play?p=-Onmc_amm9vCRqQerBEZ')">🌸 Kvetinky a zvieratká</div>
+    </div>
+
+    <button id="visitBtn" onclick="visit()">Navštíviť</button>
+  </div>
+</div>
+
+<script>
+const stations=document.querySelectorAll(".station")
+const modal=document.getElementById("modal")
+const title=document.getElementById("modalTitle")
+const icon=document.getElementById("modalIcon")
+const bar=document.getElementById("bar")
+const text=document.getElementById("progressText")
+const gameButtons=document.getElementById("gameButtons")
+const visitBtn=document.getElementById("visitBtn")
+
+let visited=new Set()
+let current=null
+
+stations.forEach(s=>{
+  s.onclick=()=>{
+    current=s.dataset.id
+    icon.innerText=s.innerText
+    title.innerText=s.parentElement.querySelector(".label").innerText
+
+    if(current==="2"){
+      gameButtons.style.display="flex"
+      visitBtn.style.display="none"
+    }else{
+      gameButtons.style.display="none"
+      visitBtn.style.display="inline-block"
+    }
+
+    modal.style.display="flex"
+  }
+})
+
+function visit(){
+  if(!visited.has(current)){
+    visited.add(current)
+    document.querySelector(`[data-id="${current}"]`).classList.add("visited")
+    let percent=(visited.size/8)*100
+    bar.style.width=percent+"%"
+    text.innerText=visited.size+" / 8 objavené"
+    if(visited.size===8){
+      launchConfetti()
+    }
+  }
+  modal.style.display="none"
+}
+
+function openGame(link){
+  window.open(link,"_blank")
+  visit()
+}
+
+function spawnFirefly(){
+  const f=document.createElement("div")
+  f.className="firefly"
+  f.style.left=Math.random()*100+"vw"
+  f.style.animationDuration=(6+Math.random()*8)+"s"
+  document.body.appendChild(f)
+  setTimeout(()=>f.remove(),14000)
+}
+setInterval(spawnFirefly,350)
+
+function launchConfetti(){
+  for(let i=0;i<160;i++){
+    const c=document.createElement("div")
+    c.className="confetti"
+    c.style.left=Math.random()*100+"vw"
+    c.style.background=`hsl(${Math.random()*360},80%,60%)`
+    c.style.animationDelay=Math.random()*1+"s"
+    document.body.appendChild(c)
+    setTimeout(()=>c.remove(),4000)
+  }
+}
+</script>
+
+</body>
+</html>
