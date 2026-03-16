@@ -63,6 +63,7 @@ button:hover{
 <button onclick="finishStation()">Dokončil som úlohu</button>
 
 <script>
+// Web app URL tvojho GAS
 const API="https://script.google.com/macros/s/AKfycbyRXCLcxV76FGtBiQwNNv9v21yQnbVSGwzpVk136Lk7kE4VkVfoDW4KsJ8_iaOW4dSs/exec";
 
 function startGame(){
@@ -70,18 +71,18 @@ function startGame(){
   window.open(link,"_blank");
 }
 
+// Odoslanie dát do Google Sheets cez GET
 function sendScore(station){
     const payload={
-        name:localStorage.getItem("playerName"),
-        playerId:localStorage.getItem("playerId"),
-        station:station,
-        score:(JSON.parse(localStorage.getItem("visitedStations") || "[]")).length
+        name: localStorage.getItem("playerName"),
+        playerId: localStorage.getItem("playerId"),
+        station: station,
+        score: (JSON.parse(localStorage.getItem("visitedStations") || "[]")).length
     };
-    const params=new URLSearchParams(payload).toString();
-    const url=API+"?"+params;
 
-    const img=new Image(); // len aby request prebehol, CORS-friendly
-    img.src=url;
+    const url = API+"?"+new URLSearchParams(payload).toString();
+    const img = new Image();
+    img.src = url; // CORS-friendly spôsob
 }
 
 function finishStation(){
