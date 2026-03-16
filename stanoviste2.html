@@ -13,18 +13,13 @@ body{
   text-align:center;
   padding:40px;
 }
-
-h1{
-  color:#fbbf24;
-}
-
+h1{ color:#fbbf24; }
 select{
   font-size:20px;
   padding:10px;
   margin-top:20px;
   border-radius:10px;
 }
-
 button{
   font-size:20px;
   padding:15px 30px;
@@ -34,17 +29,13 @@ button{
   border-radius:15px;
   cursor:pointer;
 }
-
-button:hover{
-  background:#fbbf24;
-}
+button:hover{ background:#fbbf24; }
 </style>
 </head>
 
 <body>
 
 <h1>🏰 Hrad písmen</h1>
-
 <p>Vyber si pexeso:</p>
 
 <select id="gameSelect">
@@ -57,13 +48,12 @@ button:hover{
 </select>
 
 <br>
-
 <button onclick="startGame()">Spustiť pexeso</button>
 <br>
 <button onclick="finishStation()">Dokončil som úlohu</button>
 
 <script>
-// Web app URL tvojho GAS
+// Tvoj Web app URL
 const API="https://script.google.com/macros/s/AKfycbyRXCLcxV76FGtBiQwNNv9v21yQnbVSGwzpVk136Lk7kE4VkVfoDW4KsJ8_iaOW4dSs/exec";
 
 function startGame(){
@@ -71,23 +61,25 @@ function startGame(){
   window.open(link,"_blank");
 }
 
-// Odoslanie dát do Google Sheets cez GET
+// Odoslanie dát do Sheet cez fetch GET
 function sendScore(station){
     const payload={
-        name: localStorage.getItem("playerName"),
-        playerId: localStorage.getItem("playerId"),
+        name: localStorage.getItem("playerName") || "unknown",
+        playerId: localStorage.getItem("playerId") || "unknown",
         station: station,
         score: (JSON.parse(localStorage.getItem("visitedStations") || "[]")).length
     };
+    const url = API + "?" + new URLSearchParams(payload).toString();
 
-    const url = API+"?"+new URLSearchParams(payload).toString();
-    const img = new Image();
-    img.src = url; // CORS-friendly spôsob
+    fetch(url)
+      .then(response => response.text())
+      .then(data => console.log("Score sent:", data))
+      .catch(err => console.error("Error sending score:", err));
 }
 
 function finishStation(){
-    const stationId=2; // Hrad písmen
-    let visited=new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
+    const stationId = 2; // Hrad písmen
+    let visited = new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
     visited.add(stationId.toString());
     localStorage.setItem("visitedStations", JSON.stringify([...visited]));
 
