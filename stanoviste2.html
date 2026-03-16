@@ -3,89 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏰 Hrad písmen</title>
-
+<title>Hrad písmen</title>
 <style>
-body{
-  font-family:Arial;
-  background:#1e3a8a;
-  color:white;
-  text-align:center;
-  padding:40px;
-}
-h1{ color:#fbbf24; }
-select{
-  font-size:20px;
-  padding:10px;
-  margin-top:20px;
-  border-radius:10px;
-}
-button{
-  font-size:20px;
-  padding:15px 30px;
-  margin-top:20px;
-  background:#f59e0b;
-  border:none;
-  border-radius:15px;
-  cursor:pointer;
-}
-button:hover{ background:#fbbf24; }
+body{font-family:Arial;background:#1e3a8a;color:white;text-align:center;padding:40px;}
+h1{color:#fbbf24;}
+select{font-size:20px;padding:10px;margin-top:20px;border-radius:10px;}
+button{font-size:20px;padding:15px 30px;margin-top:20px;background:#f59e0b;border:none;border-radius:15px;cursor:pointer;}
+button:hover{background:#fbbf24;}
 </style>
 </head>
-
 <body>
 
 <h1>🏰 Hrad písmen</h1>
-<p>Vyber si pexeso:</p>
+<p>Vyber si pexeso.</p>
 
 <select id="gameSelect">
-  <option value="https://puzzel.org/sk/memory/play?p=-OnYa0O4E3Wyx-2U2_hi">
-    ⚽ Futbalisti
-  </option>
-  <option value="https://puzzel.org/sk/memory/play?p=-Onmc_amm9vCRqQerBEZ">
-    🌸 Kvetinky a zvieratká
-  </option>
+<option value="https://puzzel.org/sk/memory/play?p=-OnYa0O4E3Wyx-2U2_hi">⚽ Futbalisti</option>
+<option value="https://puzzel.org/sk/memory/play?p=-Onmc_amm9vCRqQerBEZ">🌸 Kvetinky a zvieratká</option>
 </select>
-
 <br>
 <button onclick="startGame()">Spustiť pexeso</button>
 <br>
 <button onclick="finishStation()">Dokončil som úlohu</button>
 
 <script>
-// Tvoj Web app URL
-const API="https://script.google.com/macros/s/AKfycbyRXCLcxV76FGtBiQwNNv9v21yQnbVSGwzpVk136Lk7kE4VkVfoDW4KsJ8_iaOW4dSs/exec";
+const API="https://script.google.com/macros/s/AKfycbxs5trm3k6z3FV8NDd2WLjkfLd4dqSNAj-1-S9lS7fvqohbSm0iYFPg96BbmwW6JP54/exec";
 
 function startGame(){
-  const link=document.getElementById("gameSelect").value;
-  window.open(link,"_blank");
-}
-
-// Odoslanie dát do Sheet cez fetch GET
-function sendScore(station){
-    const payload={
-        name: localStorage.getItem("playerName") || "unknown",
-        playerId: localStorage.getItem("playerId") || "unknown",
-        station: station,
-        score: (JSON.parse(localStorage.getItem("visitedStations") || "[]")).length
-    };
-    const url = API + "?" + new URLSearchParams(payload).toString();
-
-    fetch(url)
-      .then(response => response.text())
-      .then(data => console.log("Score sent:", data))
-      .catch(err => console.error("Error sending score:", err));
+    const link = document.getElementById("gameSelect").value;
+    window.open(link, "_blank");
 }
 
 function finishStation(){
-    const stationId = 2; // Hrad písmen
+    const stationId = 2;
     let visited = new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
     visited.add(stationId.toString());
     localStorage.setItem("visitedStations", JSON.stringify([...visited]));
 
-    sendScore(stationId);
+    // odoslanie dát do Sheet cez fetch GET
+    const payload = {
+        name: localStorage.getItem("playerName") || "unknown",
+        playerId: localStorage.getItem("playerId") || "unknown",
+        station: stationId,
+        score: visited.size
+    };
+    const url = API + "?" + new URLSearchParams(payload).toString();
 
-    window.location.href="index.html";
+    fetch(url)
+        .then(r => r.text())
+        .then(data => console.log("Score sent:", data))
+        .catch(err => console.error("Chyba pri odosielaní dát:", err));
+
+    // návrat na mapu
+    window.location.href = "index.html";
 }
 </script>
 
