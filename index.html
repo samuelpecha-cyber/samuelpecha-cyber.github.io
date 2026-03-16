@@ -1,21 +1,14 @@
 <!DOCTYPE html>
 <html lang="sk">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Čarovný Les</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-
-*{
-  box-sizing:border-box;
-  font-family:'Inter',system-ui;
-}
-
+*{box-sizing:border-box;font-family:'Inter',system-ui;}
 body{
   margin:0;
   min-height:100vh;
@@ -24,13 +17,11 @@ body{
   align-items:center;
   color:white;
   overflow-x:hidden;
-
   background-image:url("https://media.discordapp.net/attachments/783422667826921534/1483075471158804490/iu_.png?ex=69b9452a&is=69b7f3aa&hm=f10e5b2a32e4f00559955472e07091c7ebd9ceff5d8973945371a931376db5e9&=&format=webp&quality=lossless&width=1503&height=859");
-  background-size:cover;
-  background-position:center;
-  background-attachment:fixed;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
-
 body::before{
   content:"";
   position:fixed;
@@ -38,62 +29,14 @@ body::before{
   background:rgba(0,0,0,0.35);
   z-index:-1;
 }
-
 header{
   text-align:center;
   padding:30px 20px 10px;
   width:100%;
   max-width:900px;
 }
-
-h1{
-  margin:0;
-  color:#fbbf24;
-  font-size:clamp(28px,5vw,42px);
-}
-
-.subtitle{
-  color:#d1fae5;
-  margin-top:8px;
-}
-
-.player-box{
-  margin-top:15px;
-}
-
-.player-box input{
-  padding:8px;
-  font-size:16px;
-  border-radius:10px;
-  border:none;
-}
-
-.player-box button{
-  padding:8px 16px;
-  border-radius:10px;
-  border:none;
-  background:#f59e0b;
-  cursor:pointer;
-  margin-left:5px;
-}
-
-.header-buttons{
-  margin-top:20px;
-}
-
-.header-buttons button{
-  font-size:18px;
-  padding:10px 20px;
-  background:#f59e0b;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-.header-buttons button:hover{
-  background:#fbbf24;
-}
-
+h1{ margin:0; color:#fbbf24; font-size:clamp(28px,5vw,42px); }
+.subtitle{ color:#d1fae5; margin-top:8px; }
 .progress-wrapper{
   margin-top:20px;
   background:#022c22;
@@ -101,20 +44,8 @@ h1{
   overflow:hidden;
   height:16px;
 }
-
-.progress-bar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#fbbf24,#f59e0b);
-  transition:.4s;
-}
-
-.progress-text{
-  margin-top:6px;
-  font-size:14px;
-  color:#fde68a;
-}
-
+.progress-bar{ height:100%; width:0%; background:linear-gradient(90deg,#fbbf24,#f59e0b); transition:.4s; }
+.progress-text{ margin-top:6px; font-size:14px; color:#fde68a; }
 .board{
   width:95%;
   max-width:900px;
@@ -122,12 +53,9 @@ h1{
   padding:60px 40px 70px;
   border-radius:30px;
   background:linear-gradient(180deg,#9a6b3f,#7a512c);
-  box-shadow:
-    0 30px 80px rgba(0,0,0,.5),
-    inset 0 8px 20px rgba(255,255,255,.15);
+  box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 8px 20px rgba(255,255,255,.15);
   border:8px solid #5b3b20;
 }
-
 .map{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -136,7 +64,6 @@ h1{
   align-items:center;
   width:100%;
 }
-
 .station{
   width:clamp(95px,10vw,120px);
   height:clamp(95px,10vw,120px);
@@ -148,39 +75,22 @@ h1{
   cursor:pointer;
   transition:.25s;
   border:4px solid rgba(255,255,255,.5);
-  box-shadow:
-    0 0 15px rgba(0,0,0,.5),
-    0 0 12px rgba(255,255,255,.2);
+  box-shadow:0 0 15px rgba(0,0,0,.5),0 0 12px rgba(255,255,255,.2);
 }
-
-.station:hover{
-  transform:scale(1.15);
-  box-shadow:
-    0 0 25px #fde047,
-    0 0 40px rgba(255,255,255,.4);
-}
-
-.station.visited{
-  filter:brightness(1.3);
-  box-shadow:
-    0 0 25px #fde047,
-    0 0 40px #fde047;
-}
-
-.label{
-  margin-top:10px;
-  background:rgba(0,0,0,.45);
-  padding:5px 12px;
+.station:hover{ transform:scale(1.15); box-shadow:0 0 25px #fde047,0 0 40px rgba(255,255,255,.4); }
+.station.visited{ filter:brightness(1.3); box-shadow:0 0 25px #fde047,0 0 40px #fde047; }
+.label{ margin-top:10px; background:rgba(0,0,0,.45); padding:5px 12px; border-radius:20px; font-size:14px; }
+.level{ display:flex; flex-direction:column; align-items:center; }
+button.reset-btn{
+  margin-top:20px;
+  background:#ef4444;
+  border:none;
+  padding:12px 22px;
   border-radius:20px;
-  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
 }
-
-.level{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
+button.reset-btn:hover{ background:#f87171; }
 .firefly{
   position:fixed;
   width:6px;
@@ -191,13 +101,11 @@ h1{
   animation:float 10s linear infinite;
   opacity:.9;
 }
-
 @keyframes float{
-  0%{transform:translateY(100vh);opacity:0}
-  10%{opacity:1}
-  100%{transform:translateY(-10vh) translateX(60px);opacity:0}
+  0%{transform:translateY(100vh) translateX(0); opacity:0;}
+  10%{opacity:1;}
+  100%{transform:translateY(-10vh) translateX(60px); opacity:0;}
 }
-
 .confetti{
   position:fixed;
   width:8px;
@@ -205,177 +113,71 @@ h1{
   top:-10px;
   animation:fall 3s linear forwards;
 }
-
-@keyframes fall{
-  to{transform:translateY(110vh) rotate(720deg)}
-}
-
+@keyframes fall{ to{transform:translateY(110vh) rotate(720deg);} }
 </style>
 </head>
-
 <body>
 
 <header>
-
 <h1>🌲 Čarovný Les 🌲</h1>
 <div class="subtitle">Objav všetky stanovištia!</div>
-
-<div class="player-box">
-<input id="playerName" placeholder="Tvoje meno">
-<button onclick="startGame()">Začať</button>
-</div>
-
-<div class="header-buttons">
-<button onclick="resetGame()">🔄 Reset hry</button>
-</div>
-
 <div class="progress-wrapper">
-<div id="bar" class="progress-bar"></div>
+  <div id="bar" class="progress-bar"></div>
 </div>
-
 <div id="progressText" class="progress-text">0 / 8 objavené</div>
-
+<button class="reset-btn" onclick="resetGame()">RESET HRY (test)</button>
 </header>
 
 <div class="board">
-
-<div class="map">
-
-<div class="level">
-<div class="station" data-id="1" style="background:#7c3aed">🦉</div>
-<div class="label">Domček Sovy</div>
-</div>
-
-<div class="level">
-<div class="station" data-id="2" style="background:#3b82f6">🏰</div>
-<div class="label">Hrad písmen</div>
-</div>
-
-<div class="level">
-<div class="station" data-id="3" style="background:#ec4899">🌸</div>
-<div class="label">Rozprávková lúka</div>
-</div>
-
-<div class="level">
-<div class="station" data-id="4" style="background:#06b6d4">🎵</div>
-<div class="label">Jazierko melódie</div>
-</div>
-
-<div class="level">
-<div class="station" data-id="5" style="background:#6366f1">🧙</div>
-<div class="label">Čarodejnícka dielňa</div>
-</div>
-
-<div class="level">
-<div class="station" data-id="6" style="background:#22c55e">🏃</div>
-<div class="label">Lesná telocvičňa</div>
-</div>
-
-<div class="level">
-<div class="station" data-id="7" style="background:#d97706">🐻</div>
-<div class="label">Medvedí brloh</div>
-</div>
-
-<div class="level">
-<div class="station" data-id="8" style="background:#f43f5e">🌈</div>
-<div class="label">Dúhový vodopád</div>
-</div>
-
-</div>
+  <div class="map">
+    <div class="level"><div class="station" data-id="1" style="background:#7c3aed">🦉</div><div class="label">Domček Sovy</div></div>
+    <div class="level"><div class="station" data-id="2" style="background:#3b82f6">🏰</div><div class="label">Hrad písmen</div></div>
+    <div class="level"><div class="station" data-id="3" style="background:#ec4899">🌸</div><div class="label">Rozprávková lúka</div></div>
+    <div class="level"><div class="station" data-id="4" style="background:#06b6d4">🎵</div><div class="label">Jazierko melódie</div></div>
+    <div class="level"><div class="station" data-id="5" style="background:#6366f1">🧙</div><div class="label">Čarodejnícka dielňa</div></div>
+    <div class="level"><div class="station" data-id="6" style="background:#22c55e">🏃</div><div class="label">Lesná telocvičňa</div></div>
+    <div class="level"><div class="station" data-id="7" style="background:#d97706">🐻</div><div class="label">Medvedí brloh</div></div>
+    <div class="level"><div class="station" data-id="8" style="background:#f43f5e">🌈</div><div class="label">Dúhový vodopád</div></div>
+  </div>
 </div>
 
 <script>
-
-const API="https://script.google.com/macros/s/AKfycbyRXCLcxV76FGtBiQwNNv9v21yQnbVSGwzpVk136Lk7kE4VkVfoDW4KsJ8_iaOW4dSs/exec";
-
-let playerId=localStorage.getItem("playerId");
-let playerName=localStorage.getItem("playerName");
-
-function startGame(){
-    const name=document.getElementById("playerName").value;
-    if(!name){
-        alert("Zadaj meno");
-        return;
-    }
-    playerId=crypto.randomUUID();
-    localStorage.setItem("playerId",playerId);
-    localStorage.setItem("playerName",name);
-    location.reload();
+if(!localStorage.getItem("playerName")){
+    const name = prompt("Zadaj svoje meno:");
+    localStorage.setItem("playerName", name || "unknown");
+}
+if(!localStorage.getItem("playerId")){
+    const id = crypto.randomUUID();
+    localStorage.setItem("playerId", id);
 }
 
-// reset hry
-function resetGame(){
-    if(confirm("Naozaj chceš resetovať hru?")){
-        localStorage.removeItem("visitedStations");
-        localStorage.removeItem("playerId");
-        localStorage.removeItem("playerName");
-        location.reload();
-    }
-}
+const stations = document.querySelectorAll(".station");
+const bar = document.getElementById("bar");
+const text = document.getElementById("progressText");
+let visited = new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
 
-const stations=document.querySelectorAll(".station");
-const bar=document.getElementById("bar");
-const text=document.getElementById("progressText");
-
-let visited=new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
-
-stations.forEach(s=>{
-    const id=s.dataset.id;
-    if(visited.has(id)){
-        s.classList.add("visited");
-    }
-    s.onclick=()=>{
-        if(!playerId){
-            alert("Najprv zadaj meno");
-            return;
-        }
-        window.location.href="stanoviste"+id+".html";
-    }
+// zobraz progress pri načítaní
+visited.forEach(id=>{
+    const el=document.querySelector(`[data-id="${id}"]`);
+    if(el) el.classList.add("visited");
 });
-
-bar.style.width=(visited.size/8)*100+"%";
+bar.style.width=(visited.size/8*100)+"%";
 text.innerText=visited.size+" / 8 objavené";
 
-function sendScore(station){
-    let visitedSet=new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
-    fetch(API,{
-        method:"POST",
-        mode:"no-cors",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-            name:localStorage.getItem("playerName"),
-            playerId:localStorage.getItem("playerId"),
-            station:station,
-            score:visitedSet.size
-        })
-    });
+stations.forEach(s=>{
+  s.onclick=()=>{
+    const id=s.dataset.id;
+    window.location.href="stanoviste"+id+".html";
+  }
+});
+
+function resetGame(){
+    localStorage.removeItem("visitedStations");
+    visited.clear();
+    stations.forEach(s=>s.classList.remove("visited"));
+    bar.style.width="0%";
+    text.innerText="0 / 8 objavené";
 }
-
-window.sendScore=sendScore;
-
-function spawnFirefly(){
-    const f=document.createElement("div");
-    f.className="firefly";
-    f.style.left=Math.random()*100+"vw";
-    f.style.animationDuration=(6+Math.random()*8)+"s";
-    document.body.appendChild(f);
-    setTimeout(()=>f.remove(),14000);
-}
-
-setInterval(spawnFirefly,350);
-
-function launchConfetti(){
-    for(let i=0;i<160;i++){
-        const c=document.createElement("div");
-        c.className="confetti";
-        c.style.left=Math.random()*100+"vw";
-        c.style.background=`hsl(${Math.random()*360},80%,60%)`;
-        c.style.animationDelay=Math.random()*1+"s";
-        document.body.appendChild(c);
-        setTimeout(()=>c.remove(),4000);
-    }
-}
-
 </script>
 
 </body>
