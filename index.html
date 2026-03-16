@@ -77,6 +77,23 @@ h1{
   margin-left:5px;
 }
 
+.header-buttons{
+  margin-top:20px;
+}
+
+.header-buttons button{
+  font-size:18px;
+  padding:10px 20px;
+  background:#f59e0b;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.header-buttons button:hover{
+  background:#fbbf24;
+}
+
 .progress-wrapper{
   margin-top:20px;
   background:#022c22;
@@ -206,16 +223,17 @@ h1{
 <div class="player-box">
 <input id="playerName" placeholder="Tvoje meno">
 <button onclick="startGame()">Začať</button>
-<button onclick="resetGame()">Reset hry</button>
+</div>
+
+<div class="header-buttons">
+<button onclick="resetGame()">🔄 Reset hry</button>
 </div>
 
 <div class="progress-wrapper">
 <div id="bar" class="progress-bar"></div>
 </div>
 
-<div id="progressText" class="progress-text">
-0 / 8 objavené
-</div>
+<div id="progressText" class="progress-text">0 / 8 objavené</div>
 
 </header>
 
