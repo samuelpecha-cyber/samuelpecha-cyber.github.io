@@ -73,11 +73,31 @@ background:#fbbf24;
 
 <script>
 
+const API="https://script.google.com/macros/s/AKfycbx2FpsQ5Yoa__VPHNv-qZpNQH3MHdS377ZaKY4l5Ph6x4ohNrj8nLmPh8K4Gsya32w9/exec"
+
 function startGame(){
 
 var link=document.getElementById("gameSelect").value;
 
 window.open(link,"_blank");
+
+}
+
+function sendScore(station){
+
+let visited = new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
+
+fetch(API,{
+method:"POST",
+body:JSON.stringify({
+
+name:localStorage.getItem("playerName"),
+playerId:localStorage.getItem("playerId"),
+station:station,
+score:visited.size
+
+})
+})
 
 }
 
@@ -88,6 +108,8 @@ let visited = new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"
 visited.add("2");
 
 localStorage.setItem("visitedStations", JSON.stringify([...visited]));
+
+sendScore(2);
 
 window.location.href="index.html";
 
