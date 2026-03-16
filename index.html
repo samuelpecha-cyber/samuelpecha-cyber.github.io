@@ -166,22 +166,14 @@ button.reset-btn:active{ transform:translateY(0); }
   100%{transform:translateY(-20vh) translateX(80px) rotate(360deg); opacity:0;}
 }
 
-/* MOBILE OPTIMIZÁCIA */
 @media (max-width:480px){
   .map{ gap:clamp(12px,6vw,20px) clamp(8px,3vw,15px); }
-  .station{ 
-    border-width:clamp(2px,1vw,3px);
-    min-height:70px; min-width:70px;
-  }
+  .station{ min-height:70px; min-width:70px; }
   header{ padding:15px 10px 10px; }
 }
-
-/* TABLET */
 @media (min-width:768px) and (max-width:1024px){
   .map{ grid-template-columns:repeat(4,1fr); gap:30px 15px; }
 }
-
-/* LANDSCAPE MOBILE */
 @media (max-width:768px) and (orientation:landscape){
   .board{ padding:20px 15px 30px; margin-top:15px; }
   header{ padding:15px 10px; }
@@ -190,7 +182,6 @@ button.reset-btn:active{ transform:translateY(0); }
 </head>
 <body>
 
-<!-- Fireflies -->
 <div class="firefly" style="animation-delay:0s;animation-duration:12s;left:10%;"></div>
 <div class="firefly" style="animation-delay:-3s;animation-duration:15s;left:30%;"></div>
 <div class="firefly" style="animation-delay:-6s;animation-duration:18s;left:70%;"></div>
@@ -246,20 +237,69 @@ button.reset-btn:active{ transform:translateY(0); }
 <script>
 const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
 
-async function initPlayer() {
-    if(!localStorage.getItem("playerName")){
-        const name = prompt("Zadaj svoje meno pre novú hru:");
-        if(name) {
+function initPlayer() {
+    if(!localStorage.getItem("playerName") || confirm("🔄 Začať ako NOVÝ HRÁČ?\n(Všetok progress sa vymaže + nové meno!)")) {
+        // ÚPLNÝ RESET
+        localStorage.clear();
+        
+        const name = prompt("Zadaj meno NOVÉHO HRÁČA:");
+        if(name && name.trim()) {
             const playerId = crypto.randomUUID();
-            localStorage.setItem("playerName", name);
+            localStorage.setItem("playerName", name.trim());
             localStorage.setItem("playerId", playerId);
             
             // ZAREGISTRUJ NOVÉHO HRÁČA DO SHEETS
-            await fetch(API + "?name=" + encodeURIComponent(name) + "&playerId=" + playerId + "&station=0&score=0", {method:'GET'});
-            console.log("🆕 Nový hráč zaregistrovaný:", name);
+            fetch(API + "?name=" + encodeURIComponent(name.trim()) + "&playerId=" + playerId + "&station=0&score=0")
+                .then(r => r.text())
+                .then(data => console.log("✅ Nový hráč zaregistrovaný:", name, data));
         }
+        window.location.reload(); // RELOAD pre čistý stav
+        return;
     }
 }
 
 const stations = document.querySelectorAll(".station");
 const bar = document.getElementById("bar");
+const text = document.getElementById("progressText");
+let visited = new Set(JSON.parse(localStorage.getItem("visitedStations") || "[]"));
+
+// START - PÝTA SA NA MENO
+initPlayer();
+
+// UPDATE PROGRESS
+function updateProgress() {
+    visited.forEach(id => {
+        const el = document.querySelector(`[data-id="${id}"]`);
+        if(el) el.classList.add("visited");
+    });
+    bar.style.width = (visited.size/8*100) + "%";
+    text.innerText = visited.size + " / 8 objavené";
+}
+
+// NAVIGÁCIA
+stations.forEach(s => {
+    s.addEventListener('click', () => {
+        const id = s.dataset.id;
+        window.location.href = "stanoviste" + id + ".html";
+    });
+});
+
+// RESET HRY
+async function resetGame() {
+    if(confirm("🔄 Naozaj chceš začať NOVÚ HRU?\nVšetky stanovištia + meno sa resetnú!")){
+        const oldName = localStorage.getItem("playerName") || "unknown";
+        const oldId = localStorage.getItem("playerId") || "unknown";
+        
+        // ODOSLA FINÁLNE SKÓRE
+        await fetch(API + "?name=" + encodeURIComponent(oldName + " (KONIEC)") + "&playerId=" + oldId + "&station=-1&score=" + visited.size);
+        
+        localStorage.clear();
+        window.location.reload();
+    }
+}
+
+// NAČÍTAJ PROGRESS (po initPlayer)
+setTimeout(updateProgress, 100);
+</script>
+</body>
+</html>
