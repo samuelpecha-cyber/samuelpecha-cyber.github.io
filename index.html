@@ -238,22 +238,20 @@ button.reset-btn:active{ transform:translateY(0); }
 const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
 
 function initPlayer() {
-    if(!localStorage.getItem("playerName") || confirm("🔄 Začať ako NOVÝ HRÁČ?\n(Všetok progress sa vymaže + nové meno!)")) {
-        // ÚPLNÝ RESET
-        localStorage.clear();
-        
+    // AK hráč NEEXISTUJE → vytvor nového
+    if(!localStorage.getItem("playerName")) {
         const name = prompt("Zadaj meno NOVÉHO HRÁČA:");
+        
         if(name && name.trim()) {
             const playerId = crypto.randomUUID();
             localStorage.setItem("playerName", name.trim());
             localStorage.setItem("playerId", playerId);
             
-            // ZAREGISTRUJ NOVÉHO HRÁČA DO SHEETS
             fetch(API + "?name=" + encodeURIComponent(name.trim()) + "&playerId=" + playerId + "&station=0&score=0")
                 .then(r => r.text())
-                .then(data => console.log("✅ Nový hráč zaregistrovaný:", name, data));
+                .then(data => console.log("✅ Nový hráč:", data));
         }
-        window.location.reload(); // RELOAD pre čistý stav
+
         return;
     }
 }
