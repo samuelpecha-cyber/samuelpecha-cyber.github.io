@@ -27,8 +27,12 @@
     border: none;
     font-size: 1.5em;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.1s;
     color: white;
+  }
+  .tone-btn:active {
+    transform: scale(0.9);
+    box-shadow: inset 0 0 8px #000;
   }
   #status {
     margin-top: 25px;
@@ -59,7 +63,7 @@
 <body>
 
 <h1>🎵 Jazierko Melódie</h1>
-<p>Poslúchni príkladnú melódiu a potom ju napodobni kliknutím na farby.</p>
+<p>Počúvaj melódiu a potom ju napodobni kliknutím na farby.</p>
 
 <div>
   <button class="tone-btn" data-color="red" style="background:red">🔴</button>
@@ -83,8 +87,15 @@ const playExampleBtn = document.getElementById("playExample");
 // Frequencies
 const tones = { red: 261.63, blue: 293.66, green: 329.63, yellow: 349.23 };
 
-// Príkladná melódia
-const exampleMelody = ["red", "blue", "green", "yellow", "blue", "red"];
+// Set of example melodies
+const exampleMelodies = [
+  ["red","blue","green","yellow","blue","red"],
+  ["green","yellow","blue","red","green"],
+  ["yellow","red","yellow","green","blue"],
+  ["blue","blue","red","green","yellow"],
+  ["red","green","blue","yellow","green","red"],
+];
+let currentMelodyIndex = 0;
 let userSequence = [];
 let score = 0;
 let isPlaying = false;
@@ -140,17 +151,33 @@ function handleUserClick(color){
   playTone(tones[color]);
   userSequence.push(color);
   const idx = userSequence.length - 1;
-  if(userSequence[idx] !== exampleMelody[idx]){
+  const currentMelody = exampleMelodies[currentMelodyIndex];
+
+  if(userSequence[idx] !== currentMelody[idx]){
     statusEl.innerHTML = "❌ Nesprávne! Skús znova.";
     userSequence = [];
     return;
   }
-  if(userSequence.length === exampleMelody.length){
+
+  if(userSequence.length === currentMelody.length){
     score++;
-    statusEl.innerHTML = `✅ Správne! Tvoja bodová hodnota: ${score}`;
-    finishStation(score);
+    statusEl.innerHTML = `✅ Správne! Body: ${score}`;
+    finishMelody();
   } else {
-    statusEl.innerHTML = `👍 Správne! Pokračuj... (${userSequence.length}/${exampleMelody.length})`;
+    statusEl.innerHTML = `👍 Správne! Pokračuj... (${userSequence.length}/${currentMelody.length})`;
+  }
+}
+
+function finishMelody(){
+  currentMelodyIndex++;
+  if(currentMelodyIndex < exampleMelodies.length){
+    setTimeout(() => {
+      statusEl.innerHTML = "🎵 Nasledujúca melódia!";
+      playMelody(exampleMelodies[currentMelodyIndex]);
+    }, 1000);
+  } else {
+    statusEl.innerHTML = `🎉 Všetky melódie dokončené! Celkové body: ${score}`;
+    finishStation(score);
   }
 }
 
@@ -159,7 +186,7 @@ toneButtons.forEach(btn => {
 });
 
 playExampleBtn.addEventListener("click", () => {
-  playMelody(exampleMelody);
+  playMelody(exampleMelodies[currentMelodyIndex]);
 });
 
 // Finish station (odoslanie dát)
