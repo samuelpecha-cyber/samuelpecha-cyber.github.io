@@ -19,16 +19,7 @@
       font-size: 2.8em;
     }
     p { font-size: 1.3em; margin: 20px 0; }
-    select {
-      font-size: 20px;
-      padding: 12px;
-      margin: 25px 0;
-      border-radius: 12px;
-      border: 3px solid #fbbf24;
-      min-width: 320px;
-      background: #a78bfa;
-      color: white;
-    }
+
     button {
       font-size: 22px;
       padding: 16px 40px;
@@ -49,6 +40,7 @@
       cursor: not-allowed; 
       transform: none; 
     }
+
     #status {
       margin-top: 30px;
       font-size: 1.2em;
@@ -64,11 +56,10 @@
 </head>
 <body>
   <h1>🐻 Medvedí brloh</h1>
-  <p>Vyber si medvediu výzvu a ukáž, aký si šikovný!</p>
+  <p>Vyber si medvediu výzvu a ukáž, čo dokážeš!</p>
 
-  <select id="gameSelect">
-    <option value="https://wordwall.net/resource/109554495">🐻 Medvedia zábava / úlohy v brlohu</option>
-  </select>
+  <!-- len info namiesto dropdownu -->
+  <p>🐻 Medvedia zábava / úlohy v brlohu</p>
 
   <br>
   <button onclick="startGame()">🎮 Spustiť medvediu hru</button>
@@ -83,9 +74,7 @@
     const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
 
     function startGame() {
-      const select = document.getElementById("gameSelect");
-      if (!select) return;
-      const link = select.value;
+      const link = "https://wordwall.net/resource/109554495";
       window.open(link, "_blank");
       showStatus("🐻 Medvedia hra otvorená v novej karte!<br>Keď dokončíš, vráť sa a klikni nižšie.", "loading");
     }
@@ -104,7 +93,6 @@
       const btn = document.getElementById("finishBtn");
       if (!statusEl || !btn) return;
 
-      // visited ako pole
       let visited = JSON.parse(localStorage.getItem("visitedStations") || "[]");
       if (!Array.isArray(visited)) visited = [];
 
@@ -157,7 +145,7 @@
         })
         .catch(err => {
           console.error("Chyba:", err);
-          showStatus(`❌ Chyba pri odosielaní<br>${err.message || "neznáma chyba"}<br>Skús znova (F12 pre viac info)`, "error");
+          showStatus(`❌ Chyba pri odosielaní<br>${err.message || "neznáma chyba"}`, "error");
           btn.disabled = false;
           btn.textContent = "✅ Dokončil som stanovisko";
         });
