@@ -3,217 +3,192 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎵 Jazierko Melódie - Stanovisko 5</title>
+<title>🎵 Jazierko Melódie</title>
 <style>
   body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(45deg, #3b82f6, #9333ea);
+    background: linear-gradient(45deg, #4ade80, #06b6d4);
     color: white;
     text-align: center;
     padding: 30px;
     margin: 0;
   }
-  h1 {
-    font-size: 2.8em;
-    color: #fbbf24;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  }
-  p { font-size: 1.2em; margin: 15px 0; }
-  .tone-btn {
-    width: 70px;
-    height: 70px;
+  h1 { font-size: 2.8em; color: #facc15; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+  p { font-size: 1.2em; margin: 10px 0; }
+  .note-button {
+    font-size: 22px;
+    padding: 16px 32px;
     margin: 10px;
-    border-radius: 12px;
+    border-radius: 20px;
     border: none;
-    font-size: 1.5em;
     cursor: pointer;
-    transition: all 0.1s;
+    transition: all 0.2s;
+    background: #f59e0b;
     color: white;
   }
-  .tone-btn:active {
-    transform: scale(0.9);
-    box-shadow: inset 0 0 8px #000;
-  }
-  #status {
-    margin-top: 25px;
-    font-size: 1.2em;
-    min-height: 100px;
-    line-height: 1.5;
-    background: rgba(255,255,255,0.1);
-    padding: 15px;
-    border-radius: 12px;
-  }
-  button#playExample {
-    font-size: 20px;
-    padding: 12px 24px;
-    margin: 12px;
-    border-radius: 15px;
-    background: #10b981;
+  .note-button:hover { background: #fbbf24; transform: scale(1.08); }
+  .note-button.active { box-shadow: 0 0 20px #34d399; transform: scale(0.95); }
+  #status { margin-top: 25px; font-size: 1.2em; min-height: 100px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; }
+  button#returnBtn {
+    font-size: 22px;
+    padding: 16px 32px;
+    margin: 20px;
+    background: #ff6b6b;
     border: none;
+    border-radius: 20px;
     color: white;
     cursor: pointer;
     transition: all 0.3s;
   }
-  button#playExample:hover {
-    transform: scale(1.05);
-    background: #34d399;
-  }
+  button#returnBtn:hover { background: #ff8e8e; transform: scale(1.08); }
 </style>
 </head>
 <body>
 
 <h1>🎵 Jazierko Melódie</h1>
-<p>Počúvaj melódiu a potom ju napodobni kliknutím na farby.</p>
+<p>Poskladaj správnu melódiu a získaj body! Každá melódia má iný počet tónov.</p>
 
-<div>
-  <button class="tone-btn" data-color="red" style="background:red">🔴</button>
-  <button class="tone-btn" data-color="blue" style="background:blue">🔵</button>
-  <button class="tone-btn" data-color="green" style="background:green">🟢</button>
-  <button class="tone-btn" data-color="yellow" style="background:yellow;color:black">🟡</button>
-</div>
-
-<button id="playExample">▶️ Prehrať príklad</button>
-
+<div id="noteButtons"></div>
 <div id="status"></div>
-<button onclick="returnToMap()">🏠 Späť na mapu</button>
+<button id="returnBtn" onclick="returnToMap()">🏠 Späť na mapu</button>
 
 <script>
 "use strict";
 
-const statusEl = document.getElementById("status");
-const toneButtons = document.querySelectorAll(".tone-btn");
-const playExampleBtn = document.getElementById("playExample");
-
-// Frequencies
-const tones = { red: 261.63, blue: 293.66, green: 329.63, yellow: 349.23 };
-
-// Set of example melodies
-const exampleMelodies = [
-  ["red","blue","green","yellow","blue","red"],
-  ["green","yellow","blue","red","green"],
-  ["yellow","red","yellow","green","blue"],
-  ["blue","blue","red","green","yellow"],
-  ["red","green","blue","yellow","green","red"],
+// --- Melódie ---
+const melodies = [
+  { name:"Melódia 1", notes:["C4","D4","E4"] },
+  { name:"Melódia 2", notes:["E4","D4","C4"] },
+  { name:"Melódia 3", notes:["C4","C4","G4","G4"] },
+  { name:"Melódia 4", notes:["A4","B4","A4"] },
+  { name:"Melódia 5", notes:["G4","F4","E4","D4"] }
 ];
-let currentMelodyIndex = 0;
+
+const noteFreq = { C4:261.63, D4:293.66, E4:329.63, F4:349.23, G4:392.00, A4:440.00, B4:493.88 };
+
+let currentMelody = 0;
 let userSequence = [];
 let score = 0;
-let isPlaying = false;
 
-// AudioContext
+const noteButtonsDiv = document.getElementById("noteButtons");
+const statusEl = document.getElementById("status");
+
+// --- Vytvorenie tlačidiel pre noty ---
+const allNotes = Object.keys(noteFreq);
+allNotes.forEach(n => {
+  const btn = document.createElement("button");
+  btn.textContent = n;
+  btn.className = "note-button";
+  btn.onclick = () => playNoteUser(n);
+  noteButtonsDiv.appendChild(btn);
+});
+
+// --- Audio context ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// Play single tone
-function playTone(freq){
+// --- Prehrávanie melódie ---
+function playMelody(melody, highlight=true) {
+  let i = 0;
+  const interval = setInterval(()=>{
+    if(i >= melody.notes.length){
+      clearInterval(interval);
+      statusEl.innerHTML = "🎵 Tvoja rada: klikni noty v správnom poradí!";
+      userSequence = [];
+      return;
+    }
+    playNote(melody.notes[i]);
+    if(highlight){
+      highlightButton(melody.notes[i]);
+    }
+    i++;
+  }, 700);
+}
+
+// --- Prehrávanie noty ---
+function playNote(note){
   const osc = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-  osc.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
   osc.type = "sine";
-  osc.frequency.value = freq;
-  gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  osc.frequency.setValueAtTime(noteFreq[note], audioCtx.currentTime);
+  osc.connect(audioCtx.destination);
   osc.start();
-  osc.stop(audioCtx.currentTime + 0.5);
+  osc.stop(audioCtx.currentTime + 0.6);
 }
 
-// Highlight a button
-function highlightBtn(color){
-  const btn = document.querySelector(`.tone-btn[data-color="${color}"]`);
+// --- Highlight tlačidla pri example ---
+function highlightButton(note){
+  const btns = document.querySelectorAll(".note-button");
+  btns.forEach(b=>b.classList.remove("active"));
+  const btn = Array.from(btns).find(b=>b.textContent===note);
   if(btn){
-    btn.style.transform = "scale(1.3)";
-    btn.style.boxShadow = "0 0 20px white";
-    btn.style.opacity = "0.8";
-    setTimeout(()=> {
-      btn.style.transform = "";
-      btn.style.boxShadow = "";
-      btn.style.opacity = "";
-    }, 500);
+    btn.classList.add("active");
+    setTimeout(()=>btn.classList.remove("active"), 600);
   }
 }
 
-// Play example melody
-async function playMelody(seq){
-  isPlaying = true;
-  statusEl.innerHTML = "🎵 Počúvaj melódiu...";
-  for(let color of seq){
-    playTone(tones[color]);
-    highlightBtn(color);
-    await new Promise(r=>setTimeout(r, 600));
-  }
-  statusEl.innerHTML = "🎶 Teraz ju napodobni!";
-  userSequence = [];
-  isPlaying = false;
+// --- Používateľ klikne notu ---
+function playNoteUser(note){
+  playNote(note);
+  userSequence.push(note);
+  highlightButton(note);
+  checkUserSequence();
 }
 
-// Check user input
-function handleUserClick(color){
-  if(isPlaying) return;
-  playTone(tones[color]);
-  userSequence.push(color);
-  const idx = userSequence.length - 1;
-  const currentMelody = exampleMelodies[currentMelodyIndex];
-
-  if(userSequence[idx] !== currentMelody[idx]){
-    statusEl.innerHTML = "❌ Nesprávne! Skús znova.";
-    userSequence = [];
-    return;
+// --- Kontrola ---
+function checkUserSequence(){
+  const melody = melodies[currentMelody].notes;
+  for(let i=0;i<userSequence.length;i++){
+    if(userSequence[i]!==melody[i]){
+      statusEl.innerHTML = "❌ Zle, začni odznova!";
+      userSequence = [];
+      return;
+    }
   }
-
-  if(userSequence.length === currentMelody.length){
+  if(userSequence.length===melody.length){
     score++;
     statusEl.innerHTML = `✅ Správne! Body: ${score}`;
-    finishMelody();
-  } else {
-    statusEl.innerHTML = `👍 Správne! Pokračuj... (${userSequence.length}/${currentMelody.length})`;
+    currentMelody++;
+    if(currentMelody < melodies.length){
+      setTimeout(()=>playMelody(melodies[currentMelody]), 1000);
+    } else {
+      statusEl.innerHTML += "<br>🎉 Dokončil si všetky melódie!";
+      finishStation(score);
+    }
   }
 }
 
-function finishMelody(){
-  currentMelodyIndex++;
-  if(currentMelodyIndex < exampleMelodies.length){
-    setTimeout(() => {
-      statusEl.innerHTML = "🎵 Nasledujúca melódia!";
-      playMelody(exampleMelodies[currentMelodyIndex]);
-    }, 1000);
-  } else {
-    statusEl.innerHTML = `🎉 Všetky melódie dokončené! Celkové body: ${score}`;
-    finishStation(score);
+// --- Späť na mapu ---
+function returnToMap(){
+  finishStation(score); // započíta aktuálne body
+  if(confirm("Vrátiť sa na mapu?")) {
+    window.location.href="index.html";
   }
 }
 
-toneButtons.forEach(btn => {
-  btn.addEventListener("click", () => handleUserClick(btn.dataset.color));
-});
-
-playExampleBtn.addEventListener("click", () => {
-  playMelody(exampleMelodies[currentMelodyIndex]);
-});
-
-// Finish station (odoslanie dát)
+// --- Finish Station ---
+const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
 function finishStation(finalScore){
-  const stationId = 5;
-  let visited = JSON.parse(localStorage.getItem("visitedStations") || "[]");
-  if(!Array.isArray(visited)) visited = [];
+  const stationId = 10; // napr. jazierko melódie
+  let visited = JSON.parse(localStorage.getItem("visitedStations")||"[]");
+  if(!Array.isArray(visited)) visited=[];
   if(!visited.includes(stationId)) visited.push(stationId);
   localStorage.setItem("visitedStations", JSON.stringify(visited));
 
-  let playerName = localStorage.getItem("playerName") || prompt("Zadaj svoje meno:", "Hráč") || "Hráč";
+  let playerName = localStorage.getItem("playerName")||prompt("Zadaj svoje meno:", "Hráč")||"Hráč";
   localStorage.setItem("playerName", playerName);
-  let playerId = localStorage.getItem("playerId") || "hrac_" + Date.now();
+  let playerId = localStorage.getItem("playerId")||"hrac_"+Date.now();
   localStorage.setItem("playerId", playerId);
 
-  const payload = {name: playerName, playerId, station: stationId, score: finalScore || 0};
-  const url = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec?" + new URLSearchParams(payload).toString();
+  const payload = {name:playerName,playerId,station:stationId,score:finalScore};
+  const url = API+"?"+new URLSearchParams(payload).toString();
 
   statusEl.innerHTML += "<br>📤 Odosielam dáta...";
-  fetch(url, {method:"GET", mode:"no-cors"})
-    .then(()=>console.log("Údaje odoslané"))
-    .catch(err=>console.error(err));
+
+  fetch(url,{method:"GET",mode:"no-cors"}).then(()=>console.log("Údaje odoslané")).catch(err=>console.error(err));
 }
 
-function returnToMap() {
-  if(confirm("Vrátiť sa na mapu?")) window.location.href = "index.html";
-}
+// --- Spusti prvú melódiu ---
+playMelody(melodies[currentMelody]);
 </script>
+
 </body>
 </html>
