@@ -51,9 +51,7 @@
   <h1>🏠 Domček sovy</h1>
   <p>Vyber si anagramy a dokonči úlohu s písmenkami!</p>
 
-  <select id="gameSelect">
-    <option value="https://wordwall.net/resource/109553939">📚 Anagramy pre prvákov</option>
-  </select>
+  <p>📚 Anagramy pre prvákov</p>
 
   <br>
   <button onclick="startGame()">🎮 Spustiť hru</button>
@@ -68,12 +66,10 @@
     const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
 
     function startGame() {
-      const select = document.getElementById("gameSelect");
-      if (!select) return;
-      const link = select.value;
-      window.open(link, "_blank");
-      showStatus("🕹️ Hra otvorená v novej karte. Po dokončení klikni ✅ nižšie!", "loading");
-    }
+  const link = "https://wordwall.net/resource/109553939";
+  window.open(link, "_blank");
+  showStatus("🕹️ Hra otvorená v novej karte. Po dokončení klikni ✅ nižšie!", "loading");
+}
 
     function showStatus(msg, className = "") {
       const el = document.getElementById("status");
