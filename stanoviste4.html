@@ -3,65 +3,138 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🔥 Stanovisko 4 - Prázdne</title>
+  <title>🎵 Jazierko melódií - Stanovisko 9</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
-      color: #333;
+      background: linear-gradient(45deg, #06b6d4, #3b82f6, #9333ea);
+      color: white;
       text-align: center;
-      padding: 40px;
+      padding: 30px;
       margin: 0;
     }
     h1 { 
-      color: #e74c3c; 
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3); 
+      color: #fbbf24; 
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
       font-size: 2.8em;
     }
-    p { font-size: 1.3em; margin: 20px 0; }
-    button {
-      font-size: 22px;
-      padding: 16px 40px;
-      margin: 12px;
-      background: #e74c3c;
-      border: none;
-      border-radius: 20px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s;
+    p { font-size: 1.2em; margin: 15px 0; }
+    .note-btn {
+      width: 100px; height: 100px; margin: 12px; font-size: 1.5em; 
+      border-radius: 20px; border: none; cursor: pointer; color: white; transition: transform 0.2s;
     }
-    button:hover { 
-      background: #c0392b; 
-      transform: scale(1.08); 
-    }
-    #status {
-      margin-top: 30px;
-      font-size: 1.2em;
-      padding: 20px;
-      border-radius: 12px;
-      min-height: 100px;
-      line-height: 1.5;
-      background: rgba(255,255,255,0.8);
-      color: #333;
-    }
+    .note-btn:hover { transform: scale(1.1); }
+    #gameArea { margin-top: 25px; min-height: 220px; }
+    #status { margin-top: 20px; font-size: 1.2em; min-height: 80px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; }
+    button.finish { font-size: 22px; padding: 14px 30px; margin: 12px; background: #ff6b6b; border: none; border-radius: 20px; color: white; cursor: pointer; transition: all 0.3s; }
+    button.finish:hover { background: #ff8e8e; transform: scale(1.08); }
+    button.finish:disabled { background: #666; cursor: not-allowed; transform: none; }
   </style>
 </head>
 <body>
-  <h1>🔥 Stanovisko 4</h1>
-  <p>Čoskoro tu bude nová aktivita!</p>
-  <p>Zatiaľ si oddýchni a pokračuj na mape.</p>
+  <h1>🎵 Jazierko melódií</h1>
+  <p>Poskladaj melódiu podľa farieb! Každá farba = tón. Sleduj poradie a získaj body.</p>
 
-  <button onclick="returnToMap()">🏠 Späť na mapu</button>
-
+  <div id="gameArea"></div>
   <div id="status"></div>
+  <button class="finish" onclick="returnToMap()">🏠 Späť na mapu</button>
 
   <script>
+    "use strict";
+
+    const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
+    const gameArea = document.getElementById('gameArea');
+    const statusEl = document.getElementById('status');
+
+    // Definícia melódií a farieb
+    const sequences = [
+      { colors:["🔴","🟡","🔵"], tones:["C","E","G"] },
+      { colors:["🟢","🟡","🔴"], tones:["F","E","C"] },
+      { colors:["🔵","🟣","🟡"], tones:["G","A","E"] }
+    ];
+
+    let currentSeq = 0;
+    let userInput = [];
+    let score = 0;
+
+    function startSequence() {
+      if(currentSeq >= sequences.length) {
+        statusEl.innerHTML = `🎉 Gratulujem! Dokončil si všetky melódie!<br>Body: ${score} / ${sequences.length * sequences[0].colors.length}`;
+        finishStation();
+        return;
+      }
+
+      const seq = sequences[currentSeq];
+      gameArea.innerHTML = `<p>Melódia ${currentSeq + 1} - klikni na správne farby v poradí:</p>`;
+      seq.colors.forEach((color, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'note-btn';
+        btn.style.background = colorToHex(color);
+        btn.textContent = color;
+        btn.onclick = () => checkInput(idx, color);
+        gameArea.appendChild(btn);
+      });
+      userInput = [];
+      statusEl.innerHTML = `🎵 Začni skladať melódiu...`;
+    }
+
+    function colorToHex(emoji) {
+      switch(emoji){
+        case "🔴": return "#ef4444";
+        case "🟡": return "#facc15";
+        case "🔵": return "#3b82f6";
+        case "🟢": return "#10b981";
+        case "🟣": return "#9333ea";
+        default: return "#fff";
+      }
+    }
+
+    function checkInput(idx, color){
+      const seq = sequences[currentSeq];
+      if(seq.colors[idx] === color){
+        userInput.push(color);
+        statusEl.innerHTML = `✅ Správne: ${userInput.join(" ")}`;
+        if(userInput.length === seq.colors.length){
+          score += seq.colors.length;
+          currentSeq++;
+          setTimeout(startSequence, 800);
+        }
+      } else {
+        statusEl.innerHTML = `❌ Nesprávne! Skús od začiatku.`;
+        userInput = [];
+      }
+    }
+
     function returnToMap() {
-      if (confirm("Vrátiť sa na mapu?")) {
+      if(confirm("Vrátiť sa na mapu?")) {
         window.location.href = "index.html";
       }
     }
+
+    function finishStation() {
+      const stationId = 9;
+      let visited = JSON.parse(localStorage.getItem("visitedStations") || "[]");
+      if(!Array.isArray(visited)) visited = [];
+      if(!visited.includes(stationId)) visited.push(stationId);
+      localStorage.setItem("visitedStations", JSON.stringify(visited));
+
+      let playerName = localStorage.getItem("playerName") || prompt("Zadaj svoje meno:", "Hráč") || "Hráč";
+      localStorage.setItem("playerName", playerName);
+      let playerId = localStorage.getItem("playerId") || "hrac_" + Date.now();
+      localStorage.setItem("playerId", playerId);
+
+      const payload = {name: playerName, playerId, station: stationId, score};
+      const url = API + "?" + new URLSearchParams(payload).toString();
+
+      statusEl.innerHTML += `<br>📤 Odosielam dáta...`;
+
+      fetch(url, {method:"GET", mode:"no-cors"})
+        .then(()=>console.log("Údaje odoslané"))
+        .catch(err=>console.error(err));
+    }
+
+    // štart hry automaticky
+    startSequence();
   </script>
 </body>
 </html>
-
