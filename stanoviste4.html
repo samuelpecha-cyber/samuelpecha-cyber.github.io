@@ -24,7 +24,7 @@
       border-radius: 20px; border: none; cursor: pointer; color: white; transition: transform 0.2s;
     }
     .note-btn:hover { transform: scale(1.1); }
-    #gameArea { margin-top: 25px; min-height: 220px; }
+    #gameArea { margin-top: 25px; min-height: 250px; }
     #status { margin-top: 20px; font-size: 1.2em; min-height: 80px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; }
     button.finish { font-size: 22px; padding: 14px 30px; margin: 12px; background: #ff6b6b; border: none; border-radius: 20px; color: white; cursor: pointer; transition: all 0.3s; }
     button.finish:hover { background: #ff8e8e; transform: scale(1.08); }
@@ -33,7 +33,7 @@
 </head>
 <body>
   <h1>🎵 Jazierko melódií</h1>
-  <p>Poskladaj melódiu podľa farieb! Každá farba = tón. Sleduj poradie a získaj body.</p>
+  <p>Poskladaj melódiu podľa farieb! Každá farba = tón. 🎶</p>
 
   <div id="gameArea"></div>
   <div id="status"></div>
@@ -46,19 +46,38 @@
     const gameArea = document.getElementById('gameArea');
     const statusEl = document.getElementById('status');
 
-    // Definícia melódií a farieb
+    // Melódie: farba + tón + frekvencia (Hz)
     const sequences = [
-      { colors:["🔴","🟡","🔵"], tones:["C","E","G"] },
-      { colors:["🟢","🟡","🔴"], tones:["F","E","C"] },
-      { colors:["🔵","🟣","🟡"], tones:["G","A","E"] }
+      { colors:["🔴","🟡","🔵","🟢"], tones:["C","D","E","F"], freqs:[261.63,293.66,329.63,349.23] },
+      { colors:["🟣","🔵","🟡","🔴"], tones:["G","A","B","C5"], freqs:[392,440,493.88,523.25] },
+      { colors:["🟢","🟡","🟣","🔵"], tones:["F","D","A","G"], freqs:[349.23,293.66,440,392] }
     ];
 
     let currentSeq = 0;
     let userInput = [];
     let score = 0;
 
-    function startSequence() {
-      if(currentSeq >= sequences.length) {
+    function playTone(freq, duration=500){
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      osc.frequency.value = freq;
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration/1000);
+    }
+
+    function playMelody(seq){
+      let delay = 0;
+      seq.freqs.forEach(freq=>{
+        setTimeout(()=>playTone(freq), delay);
+        delay += 600;
+      });
+    }
+
+    function startSequence(){
+      if(currentSeq >= sequences.length){
         statusEl.innerHTML = `🎉 Gratulujem! Dokončil si všetky melódie!<br>Body: ${score} / ${sequences.length * sequences[0].colors.length}`;
         finishStation();
         return;
@@ -66,19 +85,21 @@
 
       const seq = sequences[currentSeq];
       gameArea.innerHTML = `<p>Melódia ${currentSeq + 1} - klikni na správne farby v poradí:</p>`;
-      seq.colors.forEach((color, idx) => {
+      seq.colors.forEach((color, idx)=>{
         const btn = document.createElement('button');
         btn.className = 'note-btn';
         btn.style.background = colorToHex(color);
         btn.textContent = color;
-        btn.onclick = () => checkInput(idx, color);
+        btn.onclick = ()=>checkInput(idx, color);
         gameArea.appendChild(btn);
       });
+
+      statusEl.innerHTML = "🎵 Najskôr si vypočuj melódiu...";
+      playMelody(seq);
       userInput = [];
-      statusEl.innerHTML = `🎵 Začni skladať melódiu...`;
     }
 
-    function colorToHex(emoji) {
+    function colorToHex(emoji){
       switch(emoji){
         case "🔴": return "#ef4444";
         case "🟡": return "#facc15";
@@ -92,6 +113,7 @@
     function checkInput(idx, color){
       const seq = sequences[currentSeq];
       if(seq.colors[idx] === color){
+        playTone(seq.freqs[idx]);
         userInput.push(color);
         statusEl.innerHTML = `✅ Správne: ${userInput.join(" ")}`;
         if(userInput.length === seq.colors.length){
@@ -111,7 +133,7 @@
       }
     }
 
-    function finishStation() {
+    function finishStation(){
       const stationId = 9;
       let visited = JSON.parse(localStorage.getItem("visitedStations") || "[]");
       if(!Array.isArray(visited)) visited = [];
@@ -128,12 +150,12 @@
 
       statusEl.innerHTML += `<br>📤 Odosielam dáta...`;
 
-      fetch(url, {method:"GET", mode:"no-cors"})
+      fetch(url,{method:"GET", mode:"no-cors"})
         .then(()=>console.log("Údaje odoslané"))
         .catch(err=>console.error(err));
     }
 
-    // štart hry automaticky
+    // Štart hry automaticky
     startSequence();
   </script>
 </body>
