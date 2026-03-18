@@ -3,50 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎵 Jazierko Melódie</title>
+<title>🎵 Jazierko Melódie - Farby</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(45deg, #4ade80, #06b6d4);
-    color: white;
-    text-align: center;
-    padding: 30px;
-    margin: 0;
-  }
-  h1 { font-size: 2.8em; color: #facc15; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-  p { font-size: 1.2em; margin: 10px 0; }
-  .note-button {
-    font-size: 22px;
-    padding: 16px 32px;
-    margin: 10px;
-    border-radius: 20px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: #f59e0b;
-    color: white;
-  }
-  .note-button:hover { background: #fbbf24; transform: scale(1.08); }
-  .note-button.active { box-shadow: 0 0 20px #34d399; transform: scale(0.95); }
-  #status { margin-top: 25px; font-size: 1.2em; min-height: 100px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; }
-  button#returnBtn {
-    font-size: 22px;
-    padding: 16px 32px;
-    margin: 20px;
-    background: #ff6b6b;
-    border: none;
-    border-radius: 20px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-  button#returnBtn:hover { background: #ff8e8e; transform: scale(1.08); }
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(45deg, #4ade80, #06b6d4);
+  color: white;
+  text-align: center;
+  padding: 30px;
+  margin: 0;
+}
+h1 { font-size: 2.8em; color: #facc15; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+p { font-size: 1.2em; margin: 10px 0; }
+.note-button {
+  font-size: 22px;
+  padding: 16px 32px;
+  margin: 10px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+}
+.note-button.active { box-shadow: 0 0 20px #34d399; transform: scale(0.95); }
+.note-button.wrong { box-shadow: 0 0 20px #ef4444; background: #ef4444; transform: scale(0.95); }
+#status { margin-top: 25px; font-size: 1.2em; min-height: 100px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; }
+button#returnBtn {
+  font-size: 22px; padding: 16px 32px; margin: 20px;
+  background: #ff6b6b; border: none; border-radius: 20px; color: white; cursor: pointer; transition: all 0.3s;
+}
+button#returnBtn:hover { background: #ff8e8e; transform: scale(1.08); }
 </style>
 </head>
 <body>
 
 <h1>🎵 Jazierko Melódie</h1>
-<p>Poskladaj správnu melódiu a získaj body! Každá melódia má iný počet tónov.</p>
+<p>Poskladaj správnu melódiu podľa farieb!</p>
 
 <div id="noteButtons"></div>
 <div id="status"></div>
@@ -55,16 +47,16 @@
 <script>
 "use strict";
 
-// --- Melódie ---
+// --- Melódia farieb ---
 const melodies = [
-  { name:"Melódia 1", notes:["C4","D4","E4"] },
-  { name:"Melódia 2", notes:["E4","D4","C4"] },
-  { name:"Melódia 3", notes:["C4","C4","G4","G4"] },
-  { name:"Melódia 4", notes:["A4","B4","A4"] },
-  { name:"Melódia 5", notes:["G4","F4","E4","D4"] }
+  { name:"Melódia 1", notes:["red","green","blue","yellow"] },
+  { name:"Melódia 2", notes:["yellow","blue","green","red"] },
+  { name:"Melódia 3", notes:["green","green","red","blue"] }
 ];
 
-const noteFreq = { C4:261.63, D4:293.66, E4:329.63, F4:349.23, G4:392.00, A4:440.00, B4:493.88 };
+// Farba -> frekvencia (noty)
+const noteFreq = { red:261.63, green:329.63, blue:392.00, yellow:440.00 };
+const colorHex = { red:"#ef4444", green:"#34d399", blue:"#3b82f6", yellow:"#facc15" };
 
 let currentMelody = 0;
 let userSequence = [];
@@ -73,63 +65,53 @@ let score = 0;
 const noteButtonsDiv = document.getElementById("noteButtons");
 const statusEl = document.getElementById("status");
 
-// --- Vytvorenie tlačidiel pre noty ---
-const allNotes = Object.keys(noteFreq);
-allNotes.forEach(n => {
+// --- Vytvorenie tlačidiel ---
+Object.keys(noteFreq).forEach(color => {
   const btn = document.createElement("button");
-  btn.textContent = n;
+  btn.textContent = color;
+  btn.style.background = colorHex[color];
   btn.className = "note-button";
-  btn.onclick = () => playNoteUser(n);
+  btn.onclick = () => playNoteUser(color);
   noteButtonsDiv.appendChild(btn);
 });
 
-// --- Audio context ---
+// --- Audio ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 // --- Prehrávanie melódie ---
-function playMelody(melody, highlight=true) {
-  let i = 0;
+function playMelody(melody, highlight=true){
+  let i=0;
   const interval = setInterval(()=>{
-    if(i >= melody.notes.length){
-      clearInterval(interval);
-      statusEl.innerHTML = "🎵 Tvoja rada: klikni noty v správnom poradí!";
-      userSequence = [];
-      return;
-    }
+    if(i>=melody.notes.length){ clearInterval(interval); statusEl.innerHTML="🎵 Tvoja rada: klikni farby v poradí!"; userSequence=[]; return; }
     playNote(melody.notes[i]);
-    if(highlight){
-      highlightButton(melody.notes[i]);
-    }
+    if(highlight) highlightButton(melody.notes[i]);
     i++;
   }, 700);
 }
 
-// --- Prehrávanie noty ---
-function playNote(note){
+// --- Prehrávanie jednej noty ---
+function playNote(color){
   const osc = audioCtx.createOscillator();
   osc.type = "sine";
-  osc.frequency.setValueAtTime(noteFreq[note], audioCtx.currentTime);
+  osc.frequency.setValueAtTime(noteFreq[color], audioCtx.currentTime);
   osc.connect(audioCtx.destination);
   osc.start();
   osc.stop(audioCtx.currentTime + 0.6);
 }
 
-// --- Highlight tlačidla pri example ---
-function highlightButton(note){
+// --- Highlight tlačidla ---
+function highlightButton(color){
   const btns = document.querySelectorAll(".note-button");
-  btns.forEach(b=>b.classList.remove("active"));
-  const btn = Array.from(btns).find(b=>b.textContent===note);
-  if(btn){
-    btn.classList.add("active");
-    setTimeout(()=>btn.classList.remove("active"), 600);
-  }
+  btns.forEach(b=>b.classList.remove("active","wrong"));
+  const btn = Array.from(btns).find(b=>b.textContent===color);
+  if(btn){ btn.classList.add("active"); setTimeout(()=>btn.classList.remove("active"),600); }
 }
 
-// --- Používateľ klikne notu ---
-function playNoteUser(note){
-  playNote(note);
-  userSequence.push(note);
-  highlightButton(note);
+// --- Používateľ klikne ---
+function playNoteUser(color){
+  playNote(color);
+  userSequence.push(color);
+  highlightButton(color);
   checkUserSequence();
 }
 
@@ -138,19 +120,21 @@ function checkUserSequence(){
   const melody = melodies[currentMelody].notes;
   for(let i=0;i<userSequence.length;i++){
     if(userSequence[i]!==melody[i]){
-      statusEl.innerHTML = "❌ Zle, začni odznova!";
-      userSequence = [];
+      const btn = Array.from(document.querySelectorAll(".note-button")).find(b=>b.textContent===userSequence[i]);
+      if(btn){ btn.classList.add("wrong"); setTimeout(()=>btn.classList.remove("wrong"),600); }
+      statusEl.innerHTML="❌ Zle, začni odznova!";
+      userSequence=[];
       return;
     }
   }
   if(userSequence.length===melody.length){
     score++;
-    statusEl.innerHTML = `✅ Správne! Body: ${score}`;
+    statusEl.innerHTML=`✅ Správne! Body: ${score}`;
     currentMelody++;
     if(currentMelody < melodies.length){
-      setTimeout(()=>playMelody(melodies[currentMelody]), 1000);
+      setTimeout(()=>playMelody(melodies[currentMelody]),1000);
     } else {
-      statusEl.innerHTML += "<br>🎉 Dokončil si všetky melódie!";
+      statusEl.innerHTML+="<br>🎉 Dokončil si všetky melódie!";
       finishStation(score);
     }
   }
@@ -158,35 +142,32 @@ function checkUserSequence(){
 
 // --- Späť na mapu ---
 function returnToMap(){
-  finishStation(score); // započíta aktuálne body
-  if(confirm("Vrátiť sa na mapu?")) {
-    window.location.href="index.html";
-  }
+  finishStation(score);
+  if(confirm("Vrátiť sa na mapu?")) window.location.href="index.html";
 }
 
 // --- Finish Station ---
 const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
 function finishStation(finalScore){
-  const stationId = 10; // napr. jazierko melódie
+  const stationId = 10;
   let visited = JSON.parse(localStorage.getItem("visitedStations")||"[]");
   if(!Array.isArray(visited)) visited=[];
   if(!visited.includes(stationId)) visited.push(stationId);
-  localStorage.setItem("visitedStations", JSON.stringify(visited));
+  localStorage.setItem("visitedStations",JSON.stringify(visited));
 
-  let playerName = localStorage.getItem("playerName")||prompt("Zadaj svoje meno:", "Hráč")||"Hráč";
-  localStorage.setItem("playerName", playerName);
+  let playerName = localStorage.getItem("playerName")||prompt("Zadaj svoje meno:","Hráč")||"Hráč";
+  localStorage.setItem("playerName",playerName);
   let playerId = localStorage.getItem("playerId")||"hrac_"+Date.now();
-  localStorage.setItem("playerId", playerId);
+  localStorage.setItem("playerId",playerId);
 
   const payload = {name:playerName,playerId,station:stationId,score:finalScore};
   const url = API+"?"+new URLSearchParams(payload).toString();
 
-  statusEl.innerHTML += "<br>📤 Odosielam dáta...";
-
+  statusEl.innerHTML+="<br>📤 Odosielam dáta...";
   fetch(url,{method:"GET",mode:"no-cors"}).then(()=>console.log("Údaje odoslané")).catch(err=>console.error(err));
 }
 
-// --- Spusti prvú melódiu ---
+// --- Štart ---
 playMelody(melodies[currentMelody]);
 </script>
 
