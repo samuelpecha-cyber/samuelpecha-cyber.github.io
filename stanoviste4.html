@@ -1,162 +1,123 @@
 <!DOCTYPE html>
 <html lang="sk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎵 Jazierko melódií - Stanovisko 9</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(45deg, #06b6d4, #3b82f6, #9333ea);
-      color: white;
-      text-align: center;
-      padding: 30px;
-      margin: 0;
-    }
-    h1 { 
-      color: #fbbf24; 
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
-      font-size: 2.8em;
-    }
-    p { font-size: 1.2em; margin: 15px 0; }
-    .note-btn {
-      width: 100px; height: 100px; margin: 12px; font-size: 1.5em; 
-      border-radius: 20px; border: none; cursor: pointer; color: white; transition: transform 0.2s;
-    }
-    .note-btn:hover { transform: scale(1.1); }
-    #gameArea { margin-top: 25px; min-height: 250px; }
-    #status { margin-top: 20px; font-size: 1.2em; min-height: 80px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; }
-    button.finish { font-size: 22px; padding: 14px 30px; margin: 12px; background: #ff6b6b; border: none; border-radius: 20px; color: white; cursor: pointer; transition: all 0.3s; }
-    button.finish:hover { background: #ff8e8e; transform: scale(1.08); }
-    button.finish:disabled { background: #666; cursor: not-allowed; transform: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌊 Jazierko melódií - Série</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(45deg, #4ade80, #3b82f6, #f472b6);
+    text-align: center;
+    color: white;
+    padding: 30px;
+  }
+  h1 { font-size: 2.8em; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+  p { font-size: 1.2em; margin: 15px 0; }
+  .buttons { margin-top: 20px; }
+  .tone-btn {
+    width: 80px; height: 80px; margin: 10px; border-radius: 50%;
+    border: none; cursor: pointer; font-size: 1.2em; color: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .tone-btn:hover { transform: scale(1.1); box-shadow: 0 0 10px white; }
+  #status { margin-top: 25px; font-size: 1.2em; min-height: 100px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px;}
+  button#finish { margin-top: 20px; padding: 12px 30px; font-size: 20px; border-radius: 20px; border:none; cursor:pointer; background:#f59e0b; color:white;}
+</style>
 </head>
 <body>
-  <h1>🎵 Jazierko melódií</h1>
-  <p>Poskladaj melódiu podľa farieb! Každá farba = tón. 🎶</p>
+<h1>🌊 Jazierko melódií</h1>
+<p>Skladáš sériu melódií kliknutím na tóny. Sleduj postupnosť!</p>
 
-  <div id="gameArea"></div>
-  <div id="status"></div>
-  <button class="finish" onclick="returnToMap()">🏠 Späť na mapu</button>
+<div class="buttons">
+  <button class="tone-btn" style="background:#f87171;" data-tone="261">C</button>
+  <button class="tone-btn" style="background:#fbbf24;" data-tone="293">D</button>
+  <button class="tone-btn" style="background:#34d399;" data-tone="329">E</button>
+  <button class="tone-btn" style="background:#3b82f6;" data-tone="349">F</button>
+  <button class="tone-btn" style="background:#a78bfa;" data-tone="392">G</button>
+</div>
 
-  <script>
-    "use strict";
+<div id="status"></div>
+<button id="finish" onclick="finishStation()" disabled>✅ Dokončil som stanovisko</button>
 
-    const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
-    const gameArea = document.getElementById('gameArea');
-    const statusEl = document.getElementById('status');
+<script>
+"use strict";
 
-    // Melódie: farba + tón + frekvencia (Hz)
-    const sequences = [
-      { colors:["🔴","🟡","🔵","🟢"], tones:["C","D","E","F"], freqs:[261.63,293.66,329.63,349.23] },
-      { colors:["🟣","🔵","🟡","🔴"], tones:["G","A","B","C5"], freqs:[392,440,493.88,523.25] },
-      { colors:["🟢","🟡","🟣","🔵"], tones:["F","D","A","G"], freqs:[349.23,293.66,440,392] }
-    ];
+const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
+const statusEl = document.getElementById('status');
+const finishBtn = document.getElementById('finish');
 
-    let currentSeq = 0;
-    let userInput = [];
-    let score = 0;
+// série melódií (frekvencie v Hz)
+const melodies = [
+  [261, 329, 349],             // Melódia 1
+  [392, 349, 329, 261],        // Melódia 2
+  [293, 329, 392, 349, 261],   // Melódia 3
+  [261, 293, 329, 349, 392, 329] // Melódia 4
+];
 
-    function playTone(freq, duration=500){
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-      osc.frequency.value = freq;
-      osc.connect(gainNode);
-      gainNode.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + duration/1000);
-    }
+let currentMelody = 0;
+let playerSeq = [];
+let totalScore = 0;
 
-    function playMelody(seq){
-      let delay = 0;
-      seq.freqs.forEach(freq=>{
-        setTimeout(()=>playTone(freq), delay);
-        delay += 600;
-      });
-    }
+// prehranie tónu cez Oscillator
+function playTone(freq, duration=400) {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, ctx.currentTime);
+  osc.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + duration/1000);
+}
 
-    function startSequence(){
-      if(currentSeq >= sequences.length){
-        statusEl.innerHTML = `🎉 Gratulujem! Dokončil si všetky melódie!<br>Body: ${score} / ${sequences.length * sequences[0].colors.length}`;
-        finishStation();
-        return;
-      }
+// handler tlačidiel
+document.querySelectorAll('.tone-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const tone = parseInt(btn.dataset.tone);
+    playTone(tone);
+    playerSeq.push(tone);
 
-      const seq = sequences[currentSeq];
-      gameArea.innerHTML = `<p>Melódia ${currentSeq + 1} - klikni na správne farby v poradí:</p>`;
-      seq.colors.forEach((color, idx)=>{
-        const btn = document.createElement('button');
-        btn.className = 'note-btn';
-        btn.style.background = colorToHex(color);
-        btn.textContent = color;
-        btn.onclick = ()=>checkInput(idx, color);
-        gameArea.appendChild(btn);
-      });
+    const idx = playerSeq.length -1;
+    const melody = melodies[currentMelody];
 
-      statusEl.innerHTML = "🎵 Najskôr si vypočuj melódiu...";
-      playMelody(seq);
-      userInput = [];
-    }
-
-    function colorToHex(emoji){
-      switch(emoji){
-        case "🔴": return "#ef4444";
-        case "🟡": return "#facc15";
-        case "🔵": return "#3b82f6";
-        case "🟢": return "#10b981";
-        case "🟣": return "#9333ea";
-        default: return "#fff";
-      }
-    }
-
-    function checkInput(idx, color){
-      const seq = sequences[currentSeq];
-      if(seq.colors[idx] === color){
-        playTone(seq.freqs[idx]);
-        userInput.push(color);
-        statusEl.innerHTML = `✅ Správne: ${userInput.join(" ")}`;
-        if(userInput.length === seq.colors.length){
-          score += seq.colors.length;
-          currentSeq++;
-          setTimeout(startSequence, 800);
+    if(playerSeq[idx] !== melody[idx]){
+      statusEl.innerHTML = `❌ Nesprávny tón! Skús znova od začiatku tejto melódie.`;
+      playerSeq = [];
+    } else {
+      statusEl.innerHTML = `✅ Správny tón! Body: ${totalScore + playerSeq.length}`;
+      if(playerSeq.length === melody.length){
+        totalScore += melody.length;
+        playerSeq = [];
+        currentMelody++;
+        if(currentMelody < melodies.length){
+          statusEl.innerHTML = `🎵 Melódia dokončená! Prechádzame na ďalšiu melódiu. Celkové body: ${totalScore}`;
+        } else {
+          statusEl.innerHTML = `🎉 Všetky melódie dokončené! Celkové body: ${totalScore}`;
+          finishBtn.disabled = false;
         }
-      } else {
-        statusEl.innerHTML = `❌ Nesprávne! Skús od začiatku.`;
-        userInput = [];
       }
     }
+  });
+});
 
-    function returnToMap() {
-      if(confirm("Vrátiť sa na mapu?")) {
-        window.location.href = "index.html";
-      }
-    }
+function finishStation() {
+  const stationId = 10; // napr. jazierko melódie
+  let visited = JSON.parse(localStorage.getItem("visitedStations") || "[]");
+  if(!Array.isArray(visited)) visited=[];
+  if(!visited.includes(stationId)) visited.push(stationId);
+  localStorage.setItem("visitedStations", JSON.stringify(visited));
 
-    function finishStation(){
-      const stationId = 9;
-      let visited = JSON.parse(localStorage.getItem("visitedStations") || "[]");
-      if(!Array.isArray(visited)) visited = [];
-      if(!visited.includes(stationId)) visited.push(stationId);
-      localStorage.setItem("visitedStations", JSON.stringify(visited));
+  let playerName = localStorage.getItem("playerName") || prompt("Zadaj svoje meno:", "Hráč") || "Hráč";
+  localStorage.setItem("playerName", playerName);
+  let playerId = localStorage.getItem("playerId") || "hrac_"+Date.now();
+  localStorage.setItem("playerId", playerId);
 
-      let playerName = localStorage.getItem("playerName") || prompt("Zadaj svoje meno:", "Hráč") || "Hráč";
-      localStorage.setItem("playerName", playerName);
-      let playerId = localStorage.getItem("playerId") || "hrac_" + Date.now();
-      localStorage.setItem("playerId", playerId);
+  const payload = {name: playerName, playerId, station: stationId, score: totalScore};
+  const url = API + "?"+new URLSearchParams(payload).toString();
 
-      const payload = {name: playerName, playerId, station: stationId, score};
-      const url = API + "?" + new URLSearchParams(payload).toString();
-
-      statusEl.innerHTML += `<br>📤 Odosielam dáta...`;
-
-      fetch(url,{method:"GET", mode:"no-cors"})
-        .then(()=>console.log("Údaje odoslané"))
-        .catch(err=>console.error(err));
-    }
-
-    // Štart hry automaticky
-    startSequence();
-  </script>
+  statusEl.innerHTML += "<br>📤 Odosielam dáta...";
+  fetch(url,{method:"GET", mode:"no-cors"}).then(()=>console.log("Údaje odoslané")).catch(err=>console.error(err));
+}
+</script>
 </body>
 </html>
