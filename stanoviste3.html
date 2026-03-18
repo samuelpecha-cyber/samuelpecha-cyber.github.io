@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌟 Stanovisko 3 - Angličtina pre škôlkarov</title>
+  <title>🌟 Stanovisko 3 - Angličtina na lúke</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -40,7 +40,6 @@
 
   <div id="gameArea"></div>
   <div id="status"></div>
-
   <button onclick="returnToMap()">🏠 Späť na mapu</button>
 
   <script>
@@ -50,59 +49,86 @@
     const gameArea = document.getElementById('gameArea');
     const statusEl = document.getElementById('status');
 
-    const games = {
-      fruit: {
-        word: "Apple",
-        hint: "🍎 Toto ovocie je červené a sladké",
-        images: [
-          {src: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimages.pexels.com%2Fphotos%2F39803%2Fpexels-photo-39803.jpeg%3Fcs%3Dsrgb%26dl%3Dfood-healthy-apple-39803.jpg%26fm%3Djpg&f=1&nofb=1&ipt=bfd76dd0b1f1a859eb4b8020cc45bc88636e40470e2b3b8bc06e037a738b6740", correct: true, alt: "Apple"},
-          {src: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fdinoanimals.com%2Fwp-content%2Fuploads%2F2023%2F03%2FDomestic-cat-32.jpg&f=1&nofb=1&ipt=04c99b64af7f3bc9582002429dea70d03f8fe2fa57670d388b4e5ca79efa5340", correct: false, alt: "Cat"},
-          {src: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.lindsaybaca.com%2Fwp-content%2Fuploads%2F2019%2F11%2FKevin_21_8x12-1.jpg&f=1&nofb=1&ipt=1d1e18cb3e4af2c2f36ae188a31c2b67a74e4652f40d939d3e962139a1601052", correct: false, alt: "Dog"}
-        ]
-      },
-      animals: {
-        word: "Dog",
-        hint: "🐶 Toto zviera šteká",
-        images: [
-          {src: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.britannica.com%2F25%2F234625-050-6070814C%2FBorder-Collie-dog.jpg&f=1&nofb=1&ipt=69d65fe63b2fa48eb704e8b0381b48bd342b9b7f5f64bce6aacb7ec952aafcd4", correct: true, alt: "Dog"},
-          {src: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fscience4fun.info%2Fwp-content%2Fuploads%2F2017%2F05%2Fcat.jpg&f=1&nofb=1&ipt=1fe061c935f7954b67b3e023d4eba95cd5353700230d57fff350e95e28d13e15", correct: false, alt: "Cat"},
-          {src: "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fnoshamsters.be%2Fhamsteropedia%2Fwp-content%2Fuploads%2F2012%2F01%2FDSC06671-copy-copy.jpg&f=1&nofb=1&ipt=4bdc60cfa60dcef56342b37b5f02d9b3ed76984c8158b35b386dfa75597c31a4", correct: false, alt: "Apple"}
-        ]
-      },
-      colors: {
-        word: "Red",
-        hint: "🔴 Farba jablka",
-        images: [
-          {src: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.solidbackgrounds.com%2Fimages%2F3840x2160%2F3840x2160-dark-red-solid-color-background.jpg&f=1&nofb=1&ipt=751f258f2714991e7c9e34bf9a1cc58344be75409be47c83225f2640468c247f", correct: true, alt: "Red"},
-          {src: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.solidbackgrounds.com%2Fimages%2F2560x1440%2F2560x1440-blue-solid-color-background.jpg&f=1&nofb=1&ipt=6ddeea4575dafc04a32d0c58552156dad932fb0894e7fb713fe9c3998166a3cc", correct: false, alt: "Blue"},
-          {src: "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fgetwallpapers.com%2Fwallpaper%2Ffull%2Fc%2F1%2Ff%2F108144.jpg&f=1&nofb=1&ipt=30524ef9ecfde6e2401cb8aa54ba3549328488deb4eabefdb97ae7a4d7c764fb", correct: false, alt: "Green"}
-        ]
-      }
+    const gameData = {
+      fruit: [
+        {word:"Apple", hint:"🍎 Toto ovocie je červené a sladké", images:[
+          {src:"https://images.pexels.com/photos/39803/pexels-photo-39803.jpeg", correct:true, alt:"Apple"},
+          {src:"https://dinoanimals.com/wp-content/uploads/2023/03/Domestic-cat-32.jpg", correct:false, alt:"Cat"},
+          {src:"https://www.lindsaybaca.com/wp-content/uploads/2019/11/Kevin_21_8x12-1.jpg", correct:false, alt:"Dog"}
+        ]},
+        {word:"Banana", hint:"🍌 Toto ovocie je dlhé a žlté", images:[
+          {src:"https://cdn.pixabay.com/photo/2018/06/18/16/05/bananas-3488531_1280.jpg", correct:true, alt:"Banana"},
+          {src:"https://cdn.pixabay.com/photo/2017/03/28/12/10/cat-2182904_1280.jpg", correct:false, alt:"Cat"},
+          {src:"https://cdn.pixabay.com/photo/2016/11/29/05/08/dog-1861837_1280.jpg", correct:false, alt:"Dog"}
+        ]}
+      ],
+      animals: [
+        {word:"Dog", hint:"🐶 Toto zviera šteká", images:[
+          {src:"https://cdn.britannica.com/25/234625-050-6070814C/Border-Collie-dog.jpg", correct:true, alt:"Dog"},
+          {src:"https://science4fun.info/wp-content/uploads/2017/05/cat.jpg", correct:false, alt:"Cat"},
+          {src:"http://noshamsters.be/hamsteropedia/wp-content/uploads/2012/01/DSC06671-copy-copy.jpg", correct:false, alt:"Hamster"}
+        ]},
+        {word:"Cat", hint:"🐱 Toto zviera mňauká", images:[
+          {src:"https://science4fun.info/wp-content/uploads/2017/05/cat.jpg", correct:true, alt:"Cat"},
+          {src:"https://cdn.britannica.com/25/234625-050-6070814C/Border-Collie-dog.jpg", correct:false, alt:"Dog"},
+          {src:"https://cdn.pixabay.com/photo/2016/11/29/05/08/dog-1861837_1280.jpg", correct:false, alt:"Dog"}
+        ]}
+      ],
+      colors: [
+        {word:"Red", hint:"🔴 Farba jablka", images:[
+          {src:"https://www.solidbackgrounds.com/images/3840x2160/3840x2160-dark-red-solid-color-background.jpg", correct:true, alt:"Red"},
+          {src:"https://www.solidbackgrounds.com/images/2560x1440/2560x1440-blue-solid-color-background.jpg", correct:false, alt:"Blue"},
+          {src:"http://getwallpapers.com/wallpaper/full/c/1/f/108144.jpg", correct:false, alt:"Green"}
+        ]},
+        {word:"Blue", hint:"🔵 Farba oblohy", images:[
+          {src:"https://www.solidbackgrounds.com/images/2560x1440/2560x1440-blue-solid-color-background.jpg", correct:true, alt:"Blue"},
+          {src:"https://www.solidbackgrounds.com/images/3840x2160/3840x2160-dark-red-solid-color-background.jpg", correct:false, alt:"Red"},
+          {src:"http://getwallpapers.com/wallpaper/full/c/1/f/108144.jpg", correct:false, alt:"Green"}
+        ]}
+      ]
     };
 
-    function startMiniGame(name) {
-      const game = games[name];
-      if (!game) return;
+    let currentGame = [];
+    let currentQuestion = 0;
+    let score = 0;
 
+    function startMiniGame(name) {
+      currentGame = gameData[name];
+      currentQuestion = 0;
+      score = 0;
+      showQuestion();
+      statusEl.innerHTML = "";
+    }
+
+    function showQuestion() {
+      if(currentQuestion >= currentGame.length){
+        statusEl.innerHTML = `🎉 Hotovo! Správne odpovede: ${score}/${currentGame.length}`;
+        finishStation(score);
+        gameArea.innerHTML = "";
+        return;
+      }
+      const q = currentGame[currentQuestion];
       gameArea.innerHTML = `
-        <p class="word">Slovo: <strong>${game.word}</strong></p>
-        <p>Nápoveda: ${game.hint}</p>
+        <p class="word">Slovo: <strong>${q.word}</strong></p>
+        <p>Nápoveda: ${q.hint}</p>
         <div class="images">
-          ${game.images.map(img => `<img src="${img.src}" alt="${img.alt}" onclick="checkAnswer(this, ${img.correct})">`).join('')}
+          ${q.images.map(img=>`<img src="${img.src}" alt="${img.alt}" onclick="checkAnswer(this, ${img.correct})">`).join('')}
         </div>
       `;
-      statusEl.innerHTML = "";
     }
 
     function checkAnswer(el, correct){
       if(correct){
-        statusEl.innerHTML = "✅ Správne! Úloha dokončená!";
+        score++;
         el.style.border = "4px solid #10b981";
-        finishStation();
+        statusEl.innerHTML = "✅ Správne!";
       } else {
-        statusEl.innerHTML = "❌ Skús znova! Nápoveda: klikni na obrázok, ktorý zodpovedá slovu.";
         el.style.border = "4px solid #ef4444";
+        statusEl.innerHTML = "❌ Skús znova! Nápoveda: klikni na obrázok, ktorý zodpovedá slovu.";
+        return; // neskáčeme na ďalšiu otázku
       }
+      currentQuestion++;
+      setTimeout(showQuestion, 1000); // krátka pauza pred ďalšou otázkou
     }
 
     function returnToMap() {
@@ -111,8 +137,7 @@
       }
     }
 
-    // tu môžeš vložiť tvoju existujúcu finishStation() funkciu
-    function finishStation() {
+    function finishStation(finalScore){
       const stationId = 3;
       let visited = JSON.parse(localStorage.getItem("visitedStations") || "[]");
       if(!Array.isArray(visited)) visited = [];
@@ -124,7 +149,7 @@
       let playerId = localStorage.getItem("playerId") || "hrac_" + Date.now();
       localStorage.setItem("playerId", playerId);
 
-      const payload = {name: playerName, playerId, station: stationId, score: visited.length};
+      const payload = {name: playerName, playerId, station: stationId, score: finalScore || score};
       const url = API + "?" + new URLSearchParams(payload).toString();
 
       statusEl.innerHTML += "<br>📤 Odosielam dáta...";
@@ -133,6 +158,7 @@
         .then(()=>console.log("Údaje odoslané"))
         .catch(err=>console.error(err));
     }
+
   </script>
 </body>
 </html>
