@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎵 Jazierko Melódie - Stanovisko 5</title>
+<title>🎵 Jazierko Melódie - Stanovisko 4</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -216,7 +216,7 @@ playExampleBtn.addEventListener("click", () => {
 // Finish station (save score)
 const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
 function finishStation(finalScore){
-  const stationId = 5;
+  const stationId = 4;  // ZMENENÉ Z 5 NA 4
   let visited = JSON.parse(localStorage.getItem("visitedStations") || "[]");
   if(!Array.isArray(visited)) visited = [];
   if(!visited.includes(stationId)) visited.push(stationId);
