@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌟 Stanovisko 3 - Prázdne</title>
+  <title>🌟 Stanovisko 3 - Angličtina pre škôlkarov</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
       color: white;
       text-align: center;
-      padding: 40px;
+      padding: 30px;
       margin: 0;
     }
     h1 { 
@@ -18,49 +18,121 @@
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5); 
       font-size: 2.8em;
     }
-    p { font-size: 1.3em; margin: 20px 0; }
-    button {
-      font-size: 22px;
-      padding: 16px 40px;
-      margin: 12px;
-      background: #ff6b6b;
-      border: none;
-      border-radius: 20px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    button:hover { 
-      background: #ff8e8e; 
-      transform: scale(1.08); 
-    }
-    #status {
-      margin-top: 30px;
-      font-size: 1.2em;
-      padding: 20px;
-      border-radius: 12px;
-      min-height: 100px;
-      line-height: 1.5;
-      background: rgba(255,255,255,0.1);
-    }
+    p { font-size: 1.2em; margin: 15px 0; }
+    .word { font-size: 2em; margin: 20px 0; }
+    .images img { width: 120px; margin: 15px; cursor: pointer; transition: transform 0.2s; border-radius: 12px; }
+    .images img:hover { transform: scale(1.1); }
+    #status { margin-top: 25px; font-size: 1.2em; min-height: 100px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; }
+    button { font-size: 22px; padding: 14px 30px; margin: 12px; background: #ff6b6b; border: none; border-radius: 20px; color: white; cursor: pointer; transition: all 0.3s; }
+    button:hover { background: #ff8e8e; transform: scale(1.08); }
+    button:disabled { background: #666; cursor: not-allowed; transform: none; }
   </style>
 </head>
 <body>
   <h1>🌟 Stanovisko 3</h1>
-  <p>Čoskoro tu bude nová aktivita!</p>
-  <p>Zatiaľ si oddýchni a pokračuj na mape.</p>
+  <p>Hraj mini-hry a nauč sa angličtinu hravo! 🍎🐶🌈</p>
+
+  <div>
+    <button onclick="startMiniGame('fruit')">🍎 Hra: Ovocie</button>
+    <button onclick="startMiniGame('animals')">🐶 Hra: Zvieratá</button>
+    <button onclick="startMiniGame('colors')">🌈 Hra: Farby</button>
+  </div>
+
+  <div id="gameArea"></div>
+  <div id="status"></div>
 
   <button onclick="returnToMap()">🏠 Späť na mapu</button>
 
-  <div id="status"></div>
-
   <script>
+    "use strict";
+
+    const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
+    const gameArea = document.getElementById('gameArea');
+    const statusEl = document.getElementById('status');
+
+    const games = {
+      fruit: {
+        word: "Apple",
+        hint: "🍎 Toto ovocie je červené a sladké",
+        images: [
+          {src: "https://i.imgur.com/1XbGxju.png", correct: true, alt: "Apple"},
+          {src: "https://i.imgur.com/0wUJlX9.png", correct: false, alt: "Cat"},
+          {src: "https://i.imgur.com/1jzT3nQ.png", correct: false, alt: "Dog"}
+        ]
+      },
+      animals: {
+        word: "Dog",
+        hint: "🐶 Toto zviera šteká",
+        images: [
+          {src: "https://i.imgur.com/1jzT3nQ.png", correct: true, alt: "Dog"},
+          {src: "https://i.imgur.com/0wUJlX9.png", correct: false, alt: "Cat"},
+          {src: "https://i.imgur.com/1XbGxju.png", correct: false, alt: "Apple"}
+        ]
+      },
+      colors: {
+        word: "Red",
+        hint: "🔴 Farba červenej jablka",
+        images: [
+          {src: "https://via.placeholder.com/120/ff0000/ffffff?text=Red", correct: true, alt: "Red"},
+          {src: "https://via.placeholder.com/120/0000ff/ffffff?text=Blue", correct: false, alt: "Blue"},
+          {src: "https://via.placeholder.com/120/00ff00/ffffff?text=Green", correct: false, alt: "Green"}
+        ]
+      }
+    };
+
+    function startMiniGame(name) {
+      const game = games[name];
+      if (!game) return;
+
+      gameArea.innerHTML = `
+        <p class="word">Slovo: <strong>${game.word}</strong></p>
+        <p>Nápoveda: ${game.hint}</p>
+        <div class="images">
+          ${game.images.map(img => `<img src="${img.src}" alt="${img.alt}" onclick="checkAnswer(this, ${img.correct})">`).join('')}
+        </div>
+      `;
+      statusEl.innerHTML = "";
+    }
+
+    function checkAnswer(el, correct){
+      if(correct){
+        statusEl.innerHTML = "✅ Správne! Úloha dokončená!";
+        el.style.border = "4px solid #10b981";
+        finishStation();
+      } else {
+        statusEl.innerHTML = "❌ Skús znova! Nápoveda: klikni na obrázok, ktorý zodpovedá slovu.";
+        el.style.border = "4px solid #ef4444";
+      }
+    }
+
     function returnToMap() {
-      if (confirm("Vrátiť sa na mapu?")) {
+      if(confirm("Vrátiť sa na mapu?")) {
         window.location.href = "index.html";
       }
+    }
+
+    // tu môžeš vložiť tvoju existujúcu finishStation() funkciu
+    function finishStation() {
+      const stationId = 3;
+      let visited = JSON.parse(localStorage.getItem("visitedStations") || "[]");
+      if(!Array.isArray(visited)) visited = [];
+      if(!visited.includes(stationId)) visited.push(stationId);
+      localStorage.setItem("visitedStations", JSON.stringify(visited));
+
+      let playerName = localStorage.getItem("playerName") || prompt("Zadaj svoje meno:", "Hráč") || "Hráč";
+      localStorage.setItem("playerName", playerName);
+      let playerId = localStorage.getItem("playerId") || "hrac_" + Date.now();
+      localStorage.setItem("playerId", playerId);
+
+      const payload = {name: playerName, playerId, station: stationId, score: visited.length};
+      const url = API + "?" + new URLSearchParams(payload).toString();
+
+      statusEl.innerHTML += "<br>📤 Odosielam dáta...";
+
+      fetch(url, {method:"GET", mode:"no-cors"})
+        .then(()=>console.log("Údaje odoslané"))
+        .catch(err=>console.error(err));
     }
   </script>
 </body>
 </html>
-
