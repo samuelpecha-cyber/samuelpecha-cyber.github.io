@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌟 Stanovisko 3 - Angličtina na lúke</title>
+  <title>🌟 Stanovisko 3 - Angličtina pre škôlkarov</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -32,12 +32,6 @@
   <h1>🌟 Stanovisko 3</h1>
   <p>Hraj mini-hry a nauč sa angličtinu hravo! 🍎🐶🌈</p>
 
-  <div>
-    <button onclick="startMiniGame('fruit')">🍎 Hra: Ovocie</button>
-    <button onclick="startMiniGame('animals')">🐶 Hra: Zvieratá</button>
-    <button onclick="startMiniGame('colors')">🌈 Hra: Farby</button>
-  </div>
-
   <div id="gameArea"></div>
   <div id="status"></div>
   <button onclick="returnToMap()">🏠 Späť na mapu</button>
@@ -49,51 +43,64 @@
     const gameArea = document.getElementById('gameArea');
     const statusEl = document.getElementById('status');
 
-    const gameData = {
-      fruit: [
-        {word:"Apple", hint:"🍎 Toto ovocie je červené a sladké", images:[
-          {src:"https://images.pexels.com/photos/39803/pexels-photo-39803.jpeg", correct:true, alt:"Apple"},
-          {src:"https://dinoanimals.com/wp-content/uploads/2023/03/Domestic-cat-32.jpg", correct:false, alt:"Cat"},
-          {src:"https://www.lindsaybaca.com/wp-content/uploads/2019/11/Kevin_21_8x12-1.jpg", correct:false, alt:"Dog"}
-        ]},
-        {word:"Banana", hint:"🍌 Toto ovocie je dlhé a žlté", images:[
-          {src:"https://cdn.pixabay.com/photo/2018/06/18/16/05/bananas-3488531_1280.jpg", correct:true, alt:"Banana"},
-          {src:"https://cdn.pixabay.com/photo/2017/03/28/12/10/cat-2182904_1280.jpg", correct:false, alt:"Cat"},
-          {src:"https://cdn.pixabay.com/photo/2016/11/29/05/08/dog-1861837_1280.jpg", correct:false, alt:"Dog"}
-        ]}
-      ],
-      animals: [
-        {word:"Dog", hint:"🐶 Toto zviera šteká", images:[
-          {src:"https://cdn.britannica.com/25/234625-050-6070814C/Border-Collie-dog.jpg", correct:true, alt:"Dog"},
-          {src:"https://science4fun.info/wp-content/uploads/2017/05/cat.jpg", correct:false, alt:"Cat"},
-          {src:"http://noshamsters.be/hamsteropedia/wp-content/uploads/2012/01/DSC06671-copy-copy.jpg", correct:false, alt:"Hamster"}
-        ]},
-        {word:"Cat", hint:"🐱 Toto zviera mňauká", images:[
-          {src:"https://science4fun.info/wp-content/uploads/2017/05/cat.jpg", correct:true, alt:"Cat"},
-          {src:"https://cdn.britannica.com/25/234625-050-6070814C/Border-Collie-dog.jpg", correct:false, alt:"Dog"},
-          {src:"https://cdn.pixabay.com/photo/2016/11/29/05/08/dog-1861837_1280.jpg", correct:false, alt:"Dog"}
-        ]}
-      ],
-      colors: [
-        {word:"Red", hint:"🔴 Farba jablka", images:[
-          {src:"https://www.solidbackgrounds.com/images/3840x2160/3840x2160-dark-red-solid-color-background.jpg", correct:true, alt:"Red"},
-          {src:"https://www.solidbackgrounds.com/images/2560x1440/2560x1440-blue-solid-color-background.jpg", correct:false, alt:"Blue"},
-          {src:"http://getwallpapers.com/wallpaper/full/c/1/f/108144.jpg", correct:false, alt:"Green"}
-        ]},
-        {word:"Blue", hint:"🔵 Farba oblohy", images:[
-          {src:"https://www.solidbackgrounds.com/images/2560x1440/2560x1440-blue-solid-color-background.jpg", correct:true, alt:"Blue"},
-          {src:"https://www.solidbackgrounds.com/images/3840x2160/3840x2160-dark-red-solid-color-background.jpg", correct:false, alt:"Red"},
-          {src:"http://getwallpapers.com/wallpaper/full/c/1/f/108144.jpg", correct:false, alt:"Green"}
-        ]}
-      ]
-    };
+    // všetky otázky postupne
+    const allQuestions = [
+      // Ovocie (3)
+      {word:"Apple", hint:"🍎 Toto ovocie je červené a sladké", images:[
+        {src:"https://images.pexels.com/photos/39803/pexels-photo-39803.jpeg", correct:true, alt:"Apple"},
+        {src:"https://dinoanimals.com/wp-content/uploads/2023/03/Domestic-cat-32.jpg", correct:false, alt:"Cat"},
+        {src:"https://www.lindsaybaca.com/wp-content/uploads/2019/11/Kevin_21_8x12-1.jpg", correct:false, alt:"Dog"}
+      ]},
+      {word:"Banana", hint:"🍌 Toto ovocie je dlhé a žlté", images:[
+        {src:"https://cdn.pixabay.com/photo/2018/06/18/16/05/bananas-3488531_1280.jpg", correct:true, alt:"Banana"},
+        {src:"https://cdn.pixabay.com/photo/2017/03/28/12/10/cat-2182904_1280.jpg", correct:false, alt:"Cat"},
+        {src:"https://cdn.pixabay.com/photo/2016/11/29/05/08/dog-1861837_1280.jpg", correct:false, alt:"Dog"}
+      ]},
+      {word:"Orange", hint:"🍊 Toto ovocie je oranžové a šťavnaté", images:[
+        {src:"https://cdn.pixabay.com/photo/2018/03/07/20/34/oranges-3208023_1280.jpg", correct:true, alt:"Orange"},
+        {src:"https://cdn.pixabay.com/photo/2017/03/28/12/10/cat-2182904_1280.jpg", correct:false, alt:"Cat"},
+        {src:"https://cdn.pixabay.com/photo/2016/11/29/05/08/dog-1861837_1280.jpg", correct:false, alt:"Dog"}
+      ]},
 
-    let currentGame = [];
+      // Zvieratká (3)
+      {word:"Dog", hint:"🐶 Toto zviera šteká", images:[
+        {src:"https://cdn.britannica.com/25/234625-050-6070814C/Border-Collie-dog.jpg", correct:true, alt:"Dog"},
+        {src:"https://science4fun.info/wp-content/uploads/2017/05/cat.jpg", correct:false, alt:"Cat"},
+        {src:"http://noshamsters.be/hamsteropedia/wp-content/uploads/2012/01/DSC06671-copy-copy.jpg", correct:false, alt:"Hamster"}
+      ]},
+      {word:"Cat", hint:"🐱 Toto zviera mňauká", images:[
+        {src:"https://science4fun.info/wp-content/uploads/2017/05/cat.jpg", correct:true, alt:"Cat"},
+        {src:"https://cdn.britannica.com/25/234625-050-6070814C/Border-Collie-dog.jpg", correct:false, alt:"Dog"},
+        {src:"https://cdn.pixabay.com/photo/2016/11/29/05/08/dog-1861837_1280.jpg", correct:false, alt:"Dog"}
+      ]},
+      {word:"Rabbit", hint:"🐇 Toto zviera skáče a má dlhé uši", images:[
+        {src:"https://cdn.pixabay.com/photo/2017/02/20/18/03/rabbit-2083492_1280.jpg", correct:true, alt:"Rabbit"},
+        {src:"https://cdn.pixabay.com/photo/2016/11/29/05/08/dog-1861837_1280.jpg", correct:false, alt:"Dog"},
+        {src:"https://science4fun.info/wp-content/uploads/2017/05/cat.jpg", correct:false, alt:"Cat"}
+      ]},
+
+      // Farby (3)
+      {word:"Red", hint:"🔴 Farba jablka", images:[
+        {src:"https://www.solidbackgrounds.com/images/3840x2160/3840x2160-dark-red-solid-color-background.jpg", correct:true, alt:"Red"},
+        {src:"https://www.solidbackgrounds.com/images/2560x1440/2560x1440-blue-solid-color-background.jpg", correct:false, alt:"Blue"},
+        {src:"http://getwallpapers.com/wallpaper/full/c/1/f/108144.jpg", correct:false, alt:"Green"}
+      ]},
+      {word:"Blue", hint:"🔵 Farba oblohy", images:[
+        {src:"https://www.solidbackgrounds.com/images/2560x1440/2560x1440-blue-solid-color-background.jpg", correct:true, alt:"Blue"},
+        {src:"https://www.solidbackgrounds.com/images/3840x2160/3840x2160-dark-red-solid-color-background.jpg", correct:false, alt:"Red"},
+        {src:"http://getwallpapers.com/wallpaper/full/c/1/f/108144.jpg", correct:false, alt:"Green"}
+      ]},
+      {word:"Green", hint:"🟢 Farba trávy", images:[
+        {src:"http://getwallpapers.com/wallpaper/full/c/1/f/108144.jpg", correct:true, alt:"Green"},
+        {src:"https://www.solidbackgrounds.com/images/2560x1440/2560x1440-blue-solid-color-background.jpg", correct:false, alt:"Blue"},
+        {src:"https://www.solidbackgrounds.com/images/3840x2160/3840x2160-dark-red-solid-color-background.jpg", correct:false, alt:"Red"}
+      ]}
+    ];
+
     let currentQuestion = 0;
     let score = 0;
 
-    function startMiniGame(name) {
-      currentGame = gameData[name];
+    function startMiniGame() {
       currentQuestion = 0;
       score = 0;
       showQuestion();
@@ -101,13 +108,13 @@
     }
 
     function showQuestion() {
-      if(currentQuestion >= currentGame.length){
-        statusEl.innerHTML = `🎉 Hotovo! Správne odpovede: ${score}/${currentGame.length}`;
-        finishStation(score);
+      if(currentQuestion >= allQuestions.length){
+        statusEl.innerHTML = `🎉 Hotovo! Správne odpovede: ${score}/${allQuestions.length}`;
         gameArea.innerHTML = "";
+        finishStation(score);
         return;
       }
-      const q = currentGame[currentQuestion];
+      const q = allQuestions[currentQuestion];
       gameArea.innerHTML = `
         <p class="word">Slovo: <strong>${q.word}</strong></p>
         <p>Nápoveda: ${q.hint}</p>
@@ -125,10 +132,10 @@
       } else {
         el.style.border = "4px solid #ef4444";
         statusEl.innerHTML = "❌ Skús znova! Nápoveda: klikni na obrázok, ktorý zodpovedá slovu.";
-        return; // neskáčeme na ďalšiu otázku
+        return; // dieťa skúsi znova
       }
       currentQuestion++;
-      setTimeout(showQuestion, 1000); // krátka pauza pred ďalšou otázkou
+      setTimeout(showQuestion, 1000);
     }
 
     function returnToMap() {
@@ -158,6 +165,9 @@
         .then(()=>console.log("Údaje odoslané"))
         .catch(err=>console.error(err));
     }
+
+    // automaticky spustí hru
+    startMiniGame();
 
   </script>
 </body>
