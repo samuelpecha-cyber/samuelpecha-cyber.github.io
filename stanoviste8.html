@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌈 Duhový vodopad - Stanovisko 8</title>
+  <title>🌈 Duhový vodopád - Stanovisko 8</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -26,137 +26,157 @@
       font-size: 2.8em;
     }
     p { font-size: 1.3em; margin: 20px 0; }
-
-    button {
-      font-size: 22px;
-      padding: 16px 40px;
-      margin: 12px;
-      background: #f59e0b;
-      border: none;
-      border-radius: 20px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s;
+    .task { font-size: 2.2em; margin: 25px 0; font-weight: bold; }
+    .options { display: flex; justify-content: center; gap: 40px; margin: 30px 0; flex-wrap: wrap; }
+    .option { 
+      width: 180px; height: 180px; 
+      cursor: pointer; 
+      border-radius: 25px; 
+      transition: all 0.3s; 
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 5em; 
+      border: 5px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.1);
+      user-select: none;
     }
-    button:hover { 
-      background: #fbbf24; 
-      transform: scale(1.08); 
-    }
-    button:disabled { 
-      background: #666; 
-      cursor: not-allowed; 
-      transform: none; 
-    }
-
-    #status {
-      margin-top: 30px;
-      font-size: 1.2em;
-      padding: 20px;
-      border-radius: 12px;
-      min-height: 100px;
-      line-height: 1.5;
-    }
-    .success { background: #10b981; }
-    .error   { background: #ef4444; }
-    .loading { background: #3b82f6; }
+    .option:hover { transform: scale(1.1); border-color: white; background: rgba(255,255,255,0.2); }
+    .option:active { transform: scale(0.98); }
+    .option.correct { border-color: #10b981 !important; background: rgba(16,185,129,0.4); animation: bounce 0.5s; }
+    .option.wrong { border-color: #ef4444 !important; background: rgba(239,68,68,0.4); }
+    @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px); } 60% { transform: translateY(-10px); } }
+    #status { margin-top: 25px; font-size: 1.2em; min-height: 100px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; }
+    button { font-size: 22px; padding: 14px 30px; margin: 12px; background: #10b981; border: none; border-radius: 20px; color: white; cursor: pointer; transition: all 0.3s; }
+    button:hover { background: #34d399; transform: scale(1.08); }
+    button:disabled { background: #666; cursor: not-allowed; transform: none; }
+    @media (max-width: 500px) { .options { gap: 20px; } .option { width: 150px; height: 150px; font-size: 4em; } }
   </style>
 </head>
 <body>
-  <h1>🌈 Duhový vodopad</h1>
-  <p>Vyber si duhovú výzvu a ukáž, čo dokážeš!</p>
+  <h1>🌈 Duhový vodopád</h1>
+  <p>Klikni na VÄČŠÍ alebo MENŠÍ predmet podľa úlohy! 🌈🏰🚢🌋</p>
 
-  <!-- info namiesto dropdownu -->
-  <p>🌈 Duhová matematika / koľko</p>
-
-  <br>
-  <button onclick="startGame()">🎮 Spustiť duhovú hru</button>
-  <br><br>
-  <button id="finishBtn" onclick="finishStation()">✅ Dokončil som stanovisko</button>
-
+  <div id="gameArea"></div>
   <div id="status"></div>
+  <button onclick="returnToMap()">🏠 Späť na mapu</button>
 
   <script>
     "use strict";
 
     const API = "https://script.google.com/macros/s/AKfycbx0t_2q7ohFvF4ZvTDEGEklEP6kNf5tFkAL89rb9ug2A5CV_a7XVMoOTyKeGjBNqjTY/exec";
+    const gameArea = document.getElementById('gameArea');
+    const statusEl = document.getElementById('status');
+
+    // 16 dúhových úloh - LEN 2 možnosti vždy!
+    const allTasks = [
+      // Domy & budovy (4)
+      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🏰", size:5}, opt2:{emoji:"🏠", size:3}, correct:0, hint:"🏰"},
+      {task:"🔵 MENŠÍ?", opt1:{emoji:"🏚️", size:2}, opt2:{emoji:"🏢", size:4}, correct:0, hint:"🏚️"},
+      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🗼", size:5}, opt2:{emoji:"⛪", size:3}, correct:0, hint:"🗼"},
+      {task:"🔵 MENŠÍ?", opt1:{emoji:"🏘️", size:2}, opt2:{emoji:"🏛️", size:4}, correct:0, hint:"🏘️"},
+
+      // Doprava (4)
+      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🚢", size:5}, opt2:{emoji:"🚗", size:3}, correct:0, hint:"🚢"},
+      {task:"🔵 MENŠÍ?", opt1:{emoji:"🛵", size:1}, opt2:{emoji:"🚐", size:4}, correct:0, hint:"🛵"},
+      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🚁", size:4}, opt2:{emoji:"🚀", size:5}, correct:1, hint:"🚀"},
+      {task:"🔵 MENŠÍ?", opt1:{emoji:"🚲", size:2}, opt2:{emoji:"🚌", size:5}, correct:0, hint:"🚲"},
+
+      // Príroda (4)
+      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🌋", size:5}, opt2:{emoji:"🏔️", size:4}, correct:0, hint:"🌋"},
+      {task:"🔵 MENŠÍ?", opt1:{emoji:"🌈", size:3}, opt2:{emoji:"🌪️", size:5}, correct:0, hint:"🌈"},
+      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🌊", size:5}, opt2:{emoji:"💧", size:1}, correct:0, hint:"🌊"},
+      {task:"🔵 MENŠÍ?", opt1:{emoji:"☀️", size:3}, opt2:{emoji:"🌙", size:4}, correct:0, hint:"☀️"},
+
+      // Zvieratá & jedlo (4)
+      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🐋", size:5}, opt2:{emoji:"🐟", size:2}, correct:0, hint:"🐋"},
+      {task:"🔵 MENŠÍ?", opt1:{emoji:"🍓", size:2}, opt2:{emoji:"🍉", size:5}, correct:0, hint:"🍓"},
+      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🦕", size:5}, opt2:{emoji:"🐌", size:1}, correct:0, hint:"🦕"},
+      {task:"🔵 MENŠÍ?", opt1:{emoji:"🐜", size:1}, opt2:{emoji:"🦋", size:3}, correct:0, hint:"🐜"}
+    ];
+
+    let currentTask = 0;
+    let score = 0;
 
     function startGame() {
-      const link = "https://wordwall.net/resource/35923730/math/koľko";
-      window.open(link, "_blank");
-      showStatus("🌈 Duhová hra otvorená v novej karte!<br>Keď dokončíš, vráť sa a klikni nižšie.", "loading");
+      currentTask = 0;
+      score = 0;
+      showTask();
+      statusEl.innerHTML = "🌈 Klikni na správny obrázok podľa úlohy! 👆";
     }
 
-    function showStatus(msg, className = "") {
-      const el = document.getElementById("status");
-      if (el) {
-        el.innerHTML = msg;
-        el.className = className;
+    function showTask() {
+      if(currentTask >= allTasks.length) {
+        statusEl.innerHTML = `🎉 Dúhový vodopád dokončený! 🌈<br>Správne odpovede: ${score}/${allTasks.length}`;
+        gameArea.innerHTML = "";
+        finishStation(score);
+        return;
+      }
+      
+      const task = allTasks[currentTask];
+      gameArea.innerHTML = `
+        <div class="task">${task.task}</div>
+        <div class="options">
+          <div class="option" onclick="checkAnswer(0)" data-index="0">${task.opt1.emoji}</div>
+          <div class="option" onclick="checkAnswer(1)" data-index="1">${task.opt2.emoji}</div>
+        </div>
+        <div style="font-size: 1.5em; margin-top: 15px; opacity: 0.8;">💡 ${task.hint} = správna odpoveď ✨</div>
+      `;
+    }
+
+    function checkAnswer(selected) {
+      const task = allTasks[currentTask];
+      const correctOption = document.querySelector('.option[data-index="' + task.correct + '"]');
+      const selectedOption = document.querySelector('.option[data-index="' + selected + '"]');
+      
+      if(selected == task.correct) {
+        score++;
+        selectedOption.classList.add('correct');
+        statusEl.innerHTML = "✅ Výborne! 🌈";
+      } else {
+        selectedOption.classList.add('wrong');
+        correctOption.classList.add('correct');
+        statusEl.innerHTML = "❌ Nie, pozri na nápovedu! 💡";
+      }
+      
+      setTimeout(() => {
+        document.querySelectorAll('.option').forEach(el => {
+          el.classList.remove('correct', 'wrong');
+        });
+        currentTask++;
+        showTask();
+      }, 1500);
+    }
+
+    function returnToMap() {
+      finishStation(score);
+      if(confirm("Vrátiť sa na mapu?")) {
+        window.location.href = "index.html";
       }
     }
 
-    function finishStation() {
+    function finishStation(finalScore){
       const stationId = 8;
-      const statusEl = document.getElementById("status");
-      const btn = document.getElementById("finishBtn");
-      if (!statusEl || !btn) return;
-
       let visited = JSON.parse(localStorage.getItem("visitedStations") || "[]");
-      if (!Array.isArray(visited)) visited = [];
+      if(!Array.isArray(visited)) visited = [];
+      if(!visited.includes(stationId)) visited.push(stationId);
+      localStorage.setItem("visitedStations", JSON.stringify(visited));
 
-      if (!visited.includes(stationId)) {
-        visited.push(stationId);
-        localStorage.setItem("visitedStations", JSON.stringify(visited));
-      }
+      let playerName = localStorage.getItem("playerName") || prompt("Zadaj svoje meno:", "Hráč") || "Hráč";
+      localStorage.setItem("playerName", playerName);
+      let playerId = localStorage.getItem("playerId") || crypto.randomUUID();
+      localStorage.setItem("playerId", playerId);
 
-      let playerName = localStorage.getItem("playerName");
-      if (!playerName) {
-        playerName = prompt("Zadaj svoje meno:", "Hráč") || "Hráč";
-        localStorage.setItem("playerName", playerName);
-      }
-
-      let playerId = localStorage.getItem("playerId");
-      if (!playerId) {
-        playerId = "hrac_" + Date.now();
-        localStorage.setItem("playerId", playerId);
-      }
-
-      const payload = {
-        name: playerName,
-        playerId: playerId,
-        station: stationId,
-        score: visited.length
-      };
-
+      const payload = {name: playerName, playerId, station: stationId, score: finalScore || score};
       const url = API + "?" + new URLSearchParams(payload).toString();
 
-      showStatus("🌈 Posielam duhové body do oblakov...", "loading");
-      btn.disabled = true;
-      btn.textContent = "Odosiela sa...";
+      statusEl.innerHTML += "<br>📤 Odosielam dáta do Dúhového vodopádu...";
 
-      fetch(url, { method: "GET", mode: "no-cors" })
-        .then(() => {
-          showStatus(
-            `✅ VODOPÁD DOKONČENÝ!<br><strong>${playerName}</strong><br>Stanovisko ${stationId} • Navštívené: ${visited.length}`,
-            "success"
-          );
-
-          localStorage.setItem(`station_${stationId}`, "completed");
-
-          setTimeout(() => {
-            if (confirm("Vrátiť sa na mapu?")) {
-              window.location.href = "index.html";
-            }
-            btn.disabled = false;
-            btn.textContent = "✅ Dokončil som stanovisko";
-          }, 2200);
-        })
-        .catch(err => {
-          console.error("Chyba:", err);
-          showStatus(`❌ Chyba pri odosielaní<br>${err.message || "neznáma chyba"}`, "error");
-          btn.disabled = false;
-          btn.textContent = "✅ Dokončil som stanovisko";
-        });
+      fetch(url, {method:"GET", mode:"no-cors"})
+        .then(()=>console.log("✅ Údaje odoslané - Stanovisko 8"))
+        .catch(err=>console.error(err));
     }
+
+    // Automaticky spustí hru
+    startGame();
   </script>
 </body>
 </html>
