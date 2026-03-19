@@ -42,8 +42,10 @@
     .option:hover { transform: scale(1.1); border-color: white; background: rgba(255,255,255,0.2); }
     .option:active { transform: scale(0.98); }
     .option.correct { border-color: #10b981 !important; background: rgba(16,185,129,0.4); animation: bounce 0.5s; }
-    .option.wrong { border-color: #ef4444 !important; background: rgba(239,68,68,0.4); }
+    .option.wrong { border-color: #ef4444 !important; background: rgba(239,68,68,0.4); animation: shake 0.5s; }
+    .option.disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
     @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px); } 60% { transform: translateY(-10px); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
     #status { margin-top: 25px; font-size: 1.2em; min-height: 100px; line-height: 1.5; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; }
     button { font-size: 22px; padding: 14px 30px; margin: 12px; background: #10b981; border: none; border-radius: 20px; color: white; cursor: pointer; transition: all 0.3s; }
     button:hover { background: #34d399; transform: scale(1.08); }
@@ -127,23 +129,35 @@
       const correctOption = document.querySelector('.option[data-index="' + task.correct + '"]');
       const selectedOption = document.querySelector('.option[data-index="' + selected + '"]');
       
+      // ZABLOKUJ ĎALŠIE KLIKNUTIA
+      document.querySelectorAll('.option').forEach(el => el.classList.add('disabled'));
+      
       if(selected == task.correct) {
         score++;
         selectedOption.classList.add('correct');
-        statusEl.innerHTML = "✅ Výborne! 🌈";
+        statusEl.innerHTML = `✅ Výborne! (${score}/${allTasks.length}) 🌈`;
+        
+        // POČKAJ NA ĎALŠIU ÚLOHU
+        setTimeout(() => {
+          document.querySelectorAll('.option').forEach(el => {
+            el.classList.remove('correct', 'wrong', 'disabled');
+          });
+          currentTask++;
+          showTask();
+        }, 1500);
       } else {
+        // ZLE - UKAŽ SPRÁVNEHO A POČKAJ NA OPRavu
         selectedOption.classList.add('wrong');
         correctOption.classList.add('correct');
-        statusEl.innerHTML = "❌ Nie, pozri na nápovedu! 💡";
+        statusEl.innerHTML = "❌ Nie, skús znova! 💡 Pozri na nápovedu!";
+        
+        setTimeout(() => {
+          // ODSTRÁŇ EFEKTY ALE NECHAJ DISABLED
+          selectedOption.classList.remove('wrong');
+          correctOption.classList.remove('correct');
+          // Tlačidlá zostanú disabled kým dieťa neklikne znova správne
+        }, 1000);
       }
-      
-      setTimeout(() => {
-        document.querySelectorAll('.option').forEach(el => {
-          el.classList.remove('correct', 'wrong');
-        });
-        currentTask++;
-        showTask();
-      }, 1500);
     }
 
     function returnToMap() {
