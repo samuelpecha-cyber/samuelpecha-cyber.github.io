@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌈 Duhový vodopád - Stanovisko 8</title>
+  <title>🌈 Dúhový vodopád - Stanovisko 8</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -54,8 +54,8 @@
   </style>
 </head>
 <body>
-  <h1>🌈 Duhový vodopád</h1>
-  <p>Klikni na VÄČŠÍ alebo MENŠÍ predmet podľa úlohy! 🌈🏰🚢🌋</p>
+  <h1>🌈 Dúhový vodopád</h1>
+  <p>Klikni na VÄČŠÍ alebo MENŠÍ predmet podľa úlohy! 🌈🏰🚢🐘</p>
 
   <div id="gameArea"></div>
   <div id="status"></div>
@@ -68,7 +68,7 @@
     const gameArea = document.getElementById('gameArea');
     const statusEl = document.getElementById('status');
 
-    // 16 ZÁKLADNÝCH úloh - RANDOMIZÁCIA pri spustení
+    // 16 LOGICKY SPRÁVNYCH úloh - SKUTOČNÉ veľkosti!
     const baseTasks = [
       // Domy & budovy (4)
       {task:"🔴 VÄČŠÍ?", small:"🏠", big:"🏰", hint:"🏰"},
@@ -82,17 +82,17 @@
       {task:"🔴 VÄČŠÍ?", small:"🚁", big:"🚀", hint:"🚀"},
       {task:"🔵 MENŠÍ?", small:"🚲", big:"🚌", hint:"🚲"},
 
-      // Príroda - NOVÉ LOGICKÉ (4)
+      // Zvieratá - FASOŇ LOGICKÉ (4)
       {task:"🔴 VÄČŠÍ?", small:"🐜", big:"🐘", hint:"🐘"},
       {task:"🔵 MENŠÍ?", small:"🐿️", big:"🐻", hint:"🐿️"},
+      {task:"🔴 VÄČŠÍ?", small:"🐱", big:"🐶", hint:"🐶"},
+      {task:"🔵 MENŠÍ?", small:"🐥", big:"🦅", hint:"🐥"},
+
+      // Ovocie & jedlo (4)  
       {task:"🔴 VÄČŠÍ?", small:"🍎", big:"🍉", hint:"🍉"},
       {task:"🔵 MENŠÍ?", small:"🍇", big:"🍌", hint:"🍇"},
-
-      // Zvieratá & jedlo (4)
-      {task:"🔴 VÄČŠÍ?", small:"🐟", big:"🐋", hint:"🐋"},
-      {task:"🔵 MENŠÍ?", small:"🐌", big:"🦕", hint:"🐌"},
-      {task:"🔴 VÄČŠÍ?", small:"🐥", big:"🦅", hint:"🦅"},
-      {task:"🔵 MENŠÍ?", small:"🐣", big:"🐓", hint:"🐣"}
+      {task:"🔴 VÄČŠÍ?", small:"🥕", big:"🥬", hint:"🥬"},
+      {task:"🔵 MENŠÍ?", small:"🍓", big:"🍊", hint:"🍓"}
     ];
 
     let allTasks = [];
@@ -105,12 +105,12 @@
       allTasks.forEach(task => {
         // 50/50 náhodné poradie pre každú úlohu
         if(Math.random() > 0.5) {
-          // LEFT = big, RIGHT = small
+          // LEFT = big, RIGHT = small (correct=0)
           task.opt1 = {emoji: task.big};
           task.opt2 = {emoji: task.small};
           task.correct = 0;
         } else {
-          // LEFT = small, RIGHT = big  
+          // LEFT = small, RIGHT = big (correct=1)
           task.opt1 = {emoji: task.small};
           task.opt2 = {emoji: task.big};
           task.correct = 1;
@@ -119,7 +119,7 @@
     }
 
     function startGame() {
-      shuffleTasks(); // NÁHODNÉ PORADIE + POZÍCIE
+      shuffleTasks();
       currentTask = 0;
       score = 0;
       showTask();
