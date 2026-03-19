@@ -68,37 +68,58 @@
     const gameArea = document.getElementById('gameArea');
     const statusEl = document.getElementById('status');
 
-    // 16 dúhových úloh - LEN 2 možnosti vždy!
-    const allTasks = [
+    // 16 ZÁKLADNÝCH úloh - RANDOMIZÁCIA pri spustení
+    const baseTasks = [
       // Domy & budovy (4)
-      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🏰", size:5}, opt2:{emoji:"🏠", size:3}, correct:0, hint:"🏰"},
-      {task:"🔵 MENŠÍ?", opt1:{emoji:"🏚️", size:2}, opt2:{emoji:"🏢", size:4}, correct:0, hint:"🏚️"},
-      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🗼", size:5}, opt2:{emoji:"⛪", size:3}, correct:0, hint:"🗼"},
-      {task:"🔵 MENŠÍ?", opt1:{emoji:"🏘️", size:2}, opt2:{emoji:"🏛️", size:4}, correct:0, hint:"🏘️"},
+      {task:"🔴 VÄČŠÍ?", small:"🏠", big:"🏰", hint:"🏰"},
+      {task:"🔵 MENŠÍ?", small:"🏚️", big:"🏢", hint:"🏚️"},
+      {task:"🔴 VÄČŠÍ?", small:"⛪", big:"🗼", hint:"🗼"},
+      {task:"🔵 MENŠÍ?", small:"🏘️", big:"🏛️", hint:"🏘️"},
 
       // Doprava (4)
-      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🚢", size:5}, opt2:{emoji:"🚗", size:3}, correct:0, hint:"🚢"},
-      {task:"🔵 MENŠÍ?", opt1:{emoji:"🛵", size:1}, opt2:{emoji:"🚐", size:4}, correct:0, hint:"🛵"},
-      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🚁", size:4}, opt2:{emoji:"🚀", size:5}, correct:1, hint:"🚀"},
-      {task:"🔵 MENŠÍ?", opt1:{emoji:"🚲", size:2}, opt2:{emoji:"🚌", size:5}, correct:0, hint:"🚲"},
+      {task:"🔴 VÄČŠÍ?", small:"🚗", big:"🚢", hint:"🚢"},
+      {task:"🔵 MENŠÍ?", small:"🛵", big:"🚐", hint:"🛵"},
+      {task:"🔴 VÄČŠÍ?", small:"🚁", big:"🚀", hint:"🚀"},
+      {task:"🔵 MENŠÍ?", small:"🚲", big:"🚌", hint:"🚲"},
 
-      // Príroda (4)
-      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🌋", size:5}, opt2:{emoji:"🏔️", size:4}, correct:0, hint:"🌋"},
-      {task:"🔵 MENŠÍ?", opt1:{emoji:"🌈", size:3}, opt2:{emoji:"🌪️", size:5}, correct:0, hint:"🌈"},
-      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🌊", size:5}, opt2:{emoji:"💧", size:1}, correct:0, hint:"🌊"},
-      {task:"🔵 MENŠÍ?", opt1:{emoji:"☀️", size:3}, opt2:{emoji:"🌙", size:4}, correct:0, hint:"☀️"},
+      // Príroda - NOVÉ LOGICKÉ (4)
+      {task:"🔴 VÄČŠÍ?", small:"🐜", big:"🐘", hint:"🐘"},
+      {task:"🔵 MENŠÍ?", small:"🐿️", big:"🐻", hint:"🐿️"},
+      {task:"🔴 VÄČŠÍ?", small:"🍎", big:"🍉", hint:"🍉"},
+      {task:"🔵 MENŠÍ?", small:"🍇", big:"🍌", hint:"🍇"},
 
       // Zvieratá & jedlo (4)
-      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🐋", size:5}, opt2:{emoji:"🐟", size:2}, correct:0, hint:"🐋"},
-      {task:"🔵 MENŠÍ?", opt1:{emoji:"🍓", size:2}, opt2:{emoji:"🍉", size:5}, correct:0, hint:"🍓"},
-      {task:"🔴 VÄČŠÍ?", opt1:{emoji:"🦕", size:5}, opt2:{emoji:"🐌", size:1}, correct:0, hint:"🦕"},
-      {task:"🔵 MENŠÍ?", opt1:{emoji:"🐜", size:1}, opt2:{emoji:"🦋", size:3}, correct:0, hint:"🐜"}
+      {task:"🔴 VÄČŠÍ?", small:"🐟", big:"🐋", hint:"🐋"},
+      {task:"🔵 MENŠÍ?", small:"🐌", big:"🦕", hint:"🐌"},
+      {task:"🔴 VÄČŠÍ?", small:"🐥", big:"🦅", hint:"🦅"},
+      {task:"🔵 MENŠÍ?", small:"🐣", big:"🐓", hint:"🐣"}
     ];
 
+    let allTasks = [];
     let currentTask = 0;
     let score = 0;
 
+    // NÁHODNÁ SHUFFLE + PRÍPRAVA
+    function shuffleTasks() {
+      allTasks = baseTasks.slice().sort(() => Math.random() - 0.5);
+      allTasks.forEach(task => {
+        // 50/50 náhodné poradie pre každú úlohu
+        if(Math.random() > 0.5) {
+          // LEFT = big, RIGHT = small
+          task.opt1 = {emoji: task.big};
+          task.opt2 = {emoji: task.small};
+          task.correct = 0;
+        } else {
+          // LEFT = small, RIGHT = big  
+          task.opt1 = {emoji: task.small};
+          task.opt2 = {emoji: task.big};
+          task.correct = 1;
+        }
+      });
+    }
+
     function startGame() {
+      shuffleTasks(); // NÁHODNÉ PORADIE + POZÍCIE
       currentTask = 0;
       score = 0;
       showTask();
@@ -129,7 +150,6 @@
       const correctOption = document.querySelector('.option[data-index="' + task.correct + '"]');
       const selectedOption = document.querySelector('.option[data-index="' + selected + '"]');
       
-      // ZABLOKUJ ĎALŠIE KLIKNUTIA
       document.querySelectorAll('.option').forEach(el => el.classList.add('disabled'));
       
       if(selected == task.correct) {
@@ -137,7 +157,6 @@
         selectedOption.classList.add('correct');
         statusEl.innerHTML = `✅ Výborne! (${score}/${allTasks.length}) 🌈`;
         
-        // POČKAJ NA ĎALŠIU ÚLOHU
         setTimeout(() => {
           document.querySelectorAll('.option').forEach(el => {
             el.classList.remove('correct', 'wrong', 'disabled');
@@ -146,16 +165,13 @@
           showTask();
         }, 1500);
       } else {
-        // ZLE - UKAŽ SPRÁVNEHO A POČKAJ NA OPRavu
         selectedOption.classList.add('wrong');
         correctOption.classList.add('correct');
         statusEl.innerHTML = "❌ Nie, skús znova! 💡 Pozri na nápovedu!";
         
         setTimeout(() => {
-          // ODSTRÁŇ EFEKTY ALE NECHAJ DISABLED
           selectedOption.classList.remove('wrong');
           correctOption.classList.remove('correct');
-          // Tlačidlá zostanú disabled kým dieťa neklikne znova správne
         }, 1000);
       }
     }
